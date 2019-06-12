@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using SmartCOM4Lib;
 
+
 namespace ATP
 {
     public partial class Form1 : Form
@@ -21,6 +22,8 @@ namespace ATP
         public SmartCOM4Lib.StBarInterval Interval;
         private string Login {get; set;}
         private string Password {get; set;}
+        public List<ATP.Collections.Bar> BarsList;
+        //public List<ATP.Collections.>
         /// <summary>
         /// Инициалезация компонентов
         /// </summary>
@@ -66,11 +69,12 @@ namespace ATP
             {
                 try
                 {
-
                     label3.Text = $"[{DateTime.Now}]: Выполняется подключение.....";
                     SmartCom.connect("mx2.ittrade.ru", 8443, Login, Password);
                     SmartCom.Connected += ConStatus;
                     SmartCom.Disconnected += DisConStatus;
+                    SmartCom.ListenPortfolio("BP15102-MO-01");
+                    SmartCom.SetPortfolio += AddPortfolio;
                 }
                 catch { label3.Text = $"[{DateTime.Now}]: Ошибка подключения"; }
             }
@@ -97,6 +101,10 @@ namespace ATP
             {
                 BeginInvoke(new MethodInvoker(delegate { label3.Text = $"[{DateTime.Now}]: Соединение разорвано"; button1.Text = "Подключиться"; }));
             }            
+        }
+        private void AddPortfolio(string portfolio, double cash, double levarge, double comission, double saldo, double liquidationValue, double initialMargin, double totalAssets)
+        {
+
         }
     }
 }

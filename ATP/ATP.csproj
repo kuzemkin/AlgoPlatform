@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\Bar.cs" />
+    <Compile Include="Collections\Portfolio.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

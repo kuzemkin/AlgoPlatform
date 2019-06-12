@@ -7,16 +7,15 @@ using System.Threading.Tasks;
 namespace ATP.Collections
 {   
     /// <summary>
-    /// Класс бар содержит необходимую информацию о баре
+    /// Класс бар содержит информацию о баре
     /// </summary>
     public class Bar
     {
-
-        public DateTime Date { get; set; }
-        public double Open { get; set; }
-        public double High { get; set; }
-        public double Low { get; set; }
-        public double Close { get; set; }       
+        DateTime Date { get; set; }
+        double Open { get; set; }
+        double High { get; set; }
+        double Low { get; set; }
+        double Close { get; set; }       
 
         /// <summary>
         /// Метод-конструктор экземпляра бар
