@@ -11,7 +11,7 @@ namespace ATP.Collections
     /// </summary>
     public class Portfolio
     {
-        string Portf { get; set; }
+        string Portfol { get; set; }
         double Cash { get; set; }
         double Leverage { get; set; }
         double Comission { get; set; }
@@ -32,7 +32,7 @@ namespace ATP.Collections
         /// <param name="totalAssets"></param>
         public Portfolio(string portfolio, double cash, double leverage, double comission, double saldo, double liquidationValue, double initialMargin, double totalAssets)
         {
-            Portf = portfolio;
+            Portfol = portfolio;
             Cash = cash;
             Leverage = leverage;
             Comission = comission;
@@ -40,6 +40,6 @@ namespace ATP.Collections
             LiquidationValue = liquidationValue;
             InitialMargin = initialMargin;
             TotalAssets = totalAssets;
-        }
+        }       
     }
 }

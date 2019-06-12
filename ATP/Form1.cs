@@ -23,7 +23,7 @@ namespace ATP
         private string Login {get; set;}
         private string Password {get; set;}
         public List<ATP.Collections.Bar> BarsList;
-        //public List<ATP.Collections.>
+        public List<ATP.Collections.Portfolio> Portf;
         /// <summary>
         /// Инициалезация компонентов
         /// </summary>
@@ -104,7 +104,7 @@ namespace ATP
         }
         private void AddPortfolio(string portfolio, double cash, double levarge, double comission, double saldo, double liquidationValue, double initialMargin, double totalAssets)
         {
-
+            Portf.Add(new Collections.Portfolio(string portfolio, double cash, double leverage, double comission, double saldo, double liquidationValue, double initialMargin, double totalAssets));
         }
     }
 }
