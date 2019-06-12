@@ -14,33 +14,51 @@ namespace ATP
     public partial class Form1 : Form
     {
         /// <summary>
-        /// Подключаем com-модуль
+        /// Подключение com-модуля
         /// </summary>
         StServerClass SmartCom = new StServerClass();
-        
-
+        //Объявление полей
+        public SmartCOM4Lib.StBarInterval Interval;
+        private string Login {get; set;}
+        private string Password {get; set;}
         /// <summary>
-        /// Инициалезируем компоненты
+        /// Инициалезация компонентов
         /// </summary>
         public Form1()
         {
             InitializeComponent();
         }
-
         /// <summary>
-        /// Подключаемся к серверу
+        /// Метод инициалезации переменной Login
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button1_Click(object sender, EventArgs e)
+        private void LostFocus1_Method(object sender, EventArgs e)
+        {
+            Login = textBox1.Text;
+        }
+        /// <summary>
+        /// Метод инициализации переменной Password
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void LostFocus2_Method(object sender, EventArgs e)
+        {
+            Password = textBox2.Text;
+        }
+        /// <summary>
+        /// Метод подключения к серверу
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Button1_Click(object sender, EventArgs e)
         {
             if(SmartCom.IsConnected())
             {
                 try
                 {
                     label3.Text = $"[{DateTime.Now}]: Выполняется отключение.....";
-                    SmartCom.disconnect();
-                    SmartCom.Disconnected += DisConStatus;
+                    SmartCom.disconnect();                   
                 }
                 catch { label3.Text = $"[{DateTime.Now}]: Возникла ошибка!"; }
             }
@@ -50,8 +68,9 @@ namespace ATP
                 {
 
                     label3.Text = $"[{DateTime.Now}]: Выполняется подключение.....";
-                    SmartCom.connect("mx2.ittrade.ru", 8443, "kuziomkin", "QJHAWU");
+                    SmartCom.connect("mx2.ittrade.ru", 8443, Login, Password);
                     SmartCom.Connected += ConStatus;
+                    SmartCom.Disconnected += DisConStatus;
                 }
                 catch { label3.Text = $"[{DateTime.Now}]: Ошибка подключения"; }
             }

@@ -80,9 +80,9 @@
             this.groupBox1.Controls.Add(this.textBox2);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Location = new System.Drawing.Point(11, 28);
+            this.groupBox1.Location = new System.Drawing.Point(27, 26);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(206, 130);
+            this.groupBox1.Size = new System.Drawing.Size(221, 130);
             this.groupBox1.TabIndex = 5;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Параметры подключения";
@@ -93,6 +93,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(171, 22);
             this.textBox1.TabIndex = 0;
+            this.textBox1.LostFocus += new System.EventHandler(this.LostFocus1_Method);
             // 
             // textBox2
             // 
@@ -100,6 +101,7 @@
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(171, 22);
             this.textBox2.TabIndex = 1;
+            this.textBox2.LostFocus += new System.EventHandler(this.LostFocus2_Method);
             // 
             // label2
             // 
@@ -121,13 +123,13 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(36, 174);
+            this.button1.Location = new System.Drawing.Point(63, 176);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(130, 30);
             this.button1.TabIndex = 4;
             this.button1.Text = "Подключиться";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.Button1_Click);
             // 
             // tabPage2
             // 
@@ -154,6 +156,11 @@
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
+        }
+
+        private void TextBox1_LostFocus(object sender, System.EventArgs e)
+        {
+            throw new System.NotImplementedException();
         }
 
         #endregion

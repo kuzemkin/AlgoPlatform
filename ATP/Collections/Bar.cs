@@ -16,10 +16,10 @@ namespace ATP.Collections
         public double Open { get; set; }
         public double High { get; set; }
         public double Low { get; set; }
-        public double Close { get; set; }
+        public double Close { get; set; }       
 
         /// <summary>
-        /// Конструктор экземпляра бар
+        /// Метод-конструктор экземпляра бар
         /// </summary>
         /// <param name="date"></param>
         /// <param name="open"></param>
