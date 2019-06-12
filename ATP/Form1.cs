@@ -57,6 +57,9 @@ namespace ATP
             }
                    
         }
+        /// <summary>
+        /// Метод отображает статус соединения с сервером
+        /// </summary>
         private void ConStatus()
         {
             if (InvokeRequired)
@@ -65,6 +68,10 @@ namespace ATP
             }           
                        
         }
+        /// <summary>
+        /// Метод отображает статус соединения с сервером
+        /// </summary>
+        /// <param name="st"></param>
         private void DisConStatus(string st= "Отключение по инициативе клиента")
         {
             if (InvokeRequired)
