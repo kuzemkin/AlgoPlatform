@@ -19,6 +19,7 @@ namespace ATP
         /// </summary>
         StServerClass SmartCom = new StServerClass();
         //Объявление полей
+        private bool disc;
         public SmartCOM4Lib.StBarInterval Interval;
         private string Login {get; set;}
         private string Password {get; set;}
@@ -59,18 +60,20 @@ namespace ATP
             if(SmartCom.IsConnected())
             {
                 try
-                {
+                {                    
                     label3.Text = $"[{DateTime.Now}]: Выполняется отключение.....";
-                    SmartCom.disconnect();                   
+                    SmartCom.disconnect();
+                    disc = true;
                 }
                 catch { label3.Text = $"[{DateTime.Now}]: Возникла ошибка!"; }
             }
             else
             {
                 try
-                {
+                {                   
                     label3.Text = $"[{DateTime.Now}]: Выполняется подключение.....";
                     SmartCom.connect("mx2.ittrade.ru", 8443, Login, Password);
+                    disc = false;
                     SmartCom.Connected += ConStatus;
                     SmartCom.Disconnected += DisConStatus;
                     SmartCom.ListenPortfolio("BP15102-MO-01");
@@ -97,14 +100,41 @@ namespace ATP
         /// <param name="st"></param>
         private void DisConStatus(string st= "Отключение по инициативе клиента")
         {
-            if (InvokeRequired)
+            if(disc==false)
             {
-                BeginInvoke(new MethodInvoker(delegate { label3.Text = $"[{DateTime.Now}]: Соединение разорвано"; button1.Text = "Подключиться"; }));
-            }            
+                if (InvokeRequired)
+                {
+                    BeginInvoke(new MethodInvoker(delegate 
+                    {
+                        System.Threading.Thread.Sleep(100);
+                        //label3.Text = $"[{DateTime.Now}]: Потеря соединения";
+                        SmartCom.connect("mx2.ittrade.ru", 8443, Login, Password);
+                    }));
+                }
+            }
+            else
+            {
+                if (InvokeRequired)
+                {
+                    BeginInvoke(new MethodInvoker(delegate { label3.Text = $"[{DateTime.Now}]: Соединение разорвано"; button1.Text = "Подключиться"; }));
+                }
+            }
+                      
         }
-        private void AddPortfolio(string portfolio, double cash, double levarge, double comission, double saldo, double liquidationValue, double initialMargin, double totalAssets)
+        /// <summary>
+        /// Медот добавляет информацию Portfolio в список
+        /// </summary>
+        /// <param name="portfolio"></param>
+        /// <param name="cash"></param>
+        /// <param name="leverage"></param>
+        /// <param name="comission"></param>
+        /// <param name="saldo"></param>
+        /// <param name="liquidationValue"></param>
+        /// <param name="initialMargin"></param>
+        /// <param name="totalAssets"></param>
+        private void AddPortfolio(string portfolio, double cash, double leverage, double comission, double saldo, double liquidationValue, double initialMargin, double totalAssets)
         {
-            Portf.Add(new Collections.Portfolio(string portfolio, double cash, double leverage, double comission, double saldo, double liquidationValue, double initialMargin, double totalAssets));
+            Portf.Add(new Collections.Portfolio(portfolio, cash, leverage, comission, saldo, liquidationValue, initialMargin, totalAssets));
         }
     }
 }
