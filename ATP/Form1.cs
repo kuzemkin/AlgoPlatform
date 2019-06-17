@@ -18,11 +18,12 @@ namespace ATP
         /// Подключение com-модуля
         /// </summary>
         StServerClass SmartCom = new StServerClass();
-        //Объявление полей
-        private bool disc;
+        //Объявление полей        
         public SmartCOM4Lib.StBarInterval Interval;
         private string Login {get; set;}
         private string Password {get; set;}
+        public string symbol = "SBER";
+        public StBarInterval interval = StBarInterval.StBarInterval_1Min;
         public List<ATP.Collections.Bar> BarsList;
         public List<ATP.Collections.Portfolio> Portf;
         /// <summary>
@@ -33,22 +34,22 @@ namespace ATP
             InitializeComponent();
         }
         /// <summary>
-        /// Метод инициалезации переменной Login
+        /// Метод инициалезации поля Login
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void LostFocus1_Method(object sender, EventArgs e)
         {
-            Login = textBox1.Text;
+            Login = textBox1.Text;            
         }
         /// <summary>
-        /// Метод инициализации переменной Password
+        /// Метод инициализации поля Password
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void LostFocus2_Method(object sender, EventArgs e)
         {
-            Password = textBox2.Text;
+            Password = textBox2.Text;            
         }
         /// <summary>
         /// Метод подключения к серверу
@@ -62,8 +63,7 @@ namespace ATP
                 try
                 {                    
                     label3.Text = $"[{DateTime.Now}]: Выполняется отключение.....";
-                    SmartCom.disconnect();
-                    disc = true;
+                    SmartCom.disconnect();                    
                 }
                 catch { label3.Text = $"[{DateTime.Now}]: Возникла ошибка!"; }
             }
@@ -72,12 +72,11 @@ namespace ATP
                 try
                 {                   
                     label3.Text = $"[{DateTime.Now}]: Выполняется подключение.....";
-                    SmartCom.connect("mx2.ittrade.ru", 8443, Login, Password);
-                    disc = false;
+                    SmartCom.connect("mx2.ittrade.ru", 8443, Login, Password);                    
                     SmartCom.Connected += ConStatus;
                     SmartCom.Disconnected += DisConStatus;
-                    SmartCom.ListenPortfolio("BP15102-MO-01");
-                    SmartCom.SetPortfolio += AddPortfolio;
+                    //SmartCom.ListenPortfolio("BP15102-MO-01");
+                    //SmartCom.SetPortfolio += AddPortfolio;
                 }
                 catch { label3.Text = $"[{DateTime.Now}]: Ошибка подключения"; }
             }
@@ -100,26 +99,10 @@ namespace ATP
         /// <param name="st"></param>
         private void DisConStatus(string st= "Отключение по инициативе клиента")
         {
-            if(disc==false)
+            if (InvokeRequired)
             {
-                if (InvokeRequired)
-                {
-                    BeginInvoke(new MethodInvoker(delegate 
-                    {
-                        System.Threading.Thread.Sleep(100);
-                        //label3.Text = $"[{DateTime.Now}]: Потеря соединения";
-                        SmartCom.connect("mx2.ittrade.ru", 8443, Login, Password);
-                    }));
-                }
+                BeginInvoke(new MethodInvoker(delegate { label3.Text = $"[{DateTime.Now}]: Соединение разорвано"; button1.Text = "Подключиться"; }));
             }
-            else
-            {
-                if (InvokeRequired)
-                {
-                    BeginInvoke(new MethodInvoker(delegate { label3.Text = $"[{DateTime.Now}]: Соединение разорвано"; button1.Text = "Подключиться"; }));
-                }
-            }
-                      
         }
         /// <summary>
         /// Медот добавляет информацию Portfolio в список
@@ -135,6 +118,98 @@ namespace ATP
         private void AddPortfolio(string portfolio, double cash, double leverage, double comission, double saldo, double liquidationValue, double initialMargin, double totalAssets)
         {
             Portf.Add(new Collections.Portfolio(portfolio, cash, leverage, comission, saldo, liquidationValue, initialMargin, totalAssets));
+        }
+        /// <summary>
+        /// Метод очистки поля ввода инструмента
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void textBox3_Click(object sender, EventArgs e) 
+        {
+            textBox3.Clear();
+        }
+        /// <summary>
+        /// Метод инициализации поля symbol
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void LostFocus3_Method(object sender, EventArgs e)
+        {
+            symbol = textBox3.Text;
+        }
+        /// <summary>
+        /// Метод инициалезирует поле ComboBox
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ComboBox1_Change(object sender, EventArgs e)
+        {
+            switch(comboBox1.Text)
+            {
+                case "1 мин.":
+                    {
+                        interval = StBarInterval.StBarInterval_1Min;
+                        break;
+                    }
+                case "5 мин.":
+                    {
+                        interval = StBarInterval.StBarInterval_5Min;
+                        break;
+                    }
+                case "10 мин.":
+                    {
+                        interval = StBarInterval.StBarInterval_10Min;
+                        break;
+                    }
+                case "15 мин.":
+                    {
+                        interval = StBarInterval.StBarInterval_15Min;
+                        break;
+                    }
+                case "30 мин.":
+                    {
+                        interval = StBarInterval.StBarInterval_30Min;
+                        break;
+                    }
+                case "60 мин.":
+                    {
+                        interval = StBarInterval.StBarInterval_60Min;
+                        break;
+                    }
+                case "2 часа":
+                    {
+                        interval = StBarInterval.StBarInterval_2Hour;
+                        break;
+                    }
+                case "4 часа":
+                    {
+                        interval = StBarInterval.StBarInterval_4Hour;
+                        break;
+                    }
+                case "1 день":
+                    {
+                        interval = StBarInterval.StBarInterval_Month;
+                        break;
+                    }
+                case "1 неделя":
+                    {
+                        interval = StBarInterval.StBarInterval_Week;
+                        break;
+                    }
+            }
+        }
+        /// <summary>
+        /// Метод получает рыночные данные по инструменту
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SmartCom.GetBars(symbol, interval, DateTime.Today, 100);
+            }
+            catch { label3.Text = $"[{DateTime.Now}]: Возникла ошибка!"; }
         }
     }
 }
