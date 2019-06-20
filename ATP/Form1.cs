@@ -24,8 +24,8 @@ namespace ATP
         private string Password {get; set;}
         public string symbol = "SBER";
         public StBarInterval interval = StBarInterval.StBarInterval_1Min;
-        public List<ATP.Collections.Bar> BarsList;
-        public List<ATP.Collections.Portfolio> Portf;
+        public List<ATP.Collections.Bar> BarsList= new List<Collections.Bar>();
+        public List<ATP.Collections.Portfolio> Portf = new List<Collections.Portfolio>();
         /// <summary>
         /// Инициалезация компонентов
         /// </summary>
@@ -40,7 +40,8 @@ namespace ATP
         /// <param name="e"></param>
         private void LostFocus1_Method(object sender, EventArgs e)
         {
-            Login = textBox1.Text;            
+            Login = textBox1.Text;
+            
         }
         /// <summary>
         /// Метод инициализации поля Password
@@ -49,7 +50,8 @@ namespace ATP
         /// <param name="e"></param>
         private void LostFocus2_Method(object sender, EventArgs e)
         {
-            Password = textBox2.Text;            
+            Password = textBox2.Text;
+           
         }
         /// <summary>
         /// Метод подключения к серверу
@@ -74,11 +76,12 @@ namespace ATP
                     label3.Text = $"[{DateTime.Now}]: Выполняется подключение.....";
                     SmartCom.connect("mx2.ittrade.ru", 8443, Login, Password);                    
                     SmartCom.Connected += ConStatus;
-                    SmartCom.Disconnected += DisConStatus;
-                    //SmartCom.ListenPortfolio("BP15102-MO-01");
-                    //SmartCom.SetPortfolio += AddPortfolio;
+                    SmartCom.Disconnected += DisConStatus;                   
                 }
-                catch { label3.Text = $"[{DateTime.Now}]: Ошибка подключения"; }
+                catch (Exception ex)
+                {
+                    label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
+                }                
             }
                    
         }
@@ -89,8 +92,21 @@ namespace ATP
         {
             if (InvokeRequired)
             {
-                BeginInvoke(new MethodInvoker(delegate { label3.Text = $"[{DateTime.Now}]: Соединение установлено"; button1.Text = "Отключиться"; }));
-            }           
+                BeginInvoke(new MethodInvoker(delegate {
+                    label3.Text = $"[{DateTime.Now}]: Соединение установлено";
+                    button1.Text = "Отключиться";
+                    try
+                    {
+                        SmartCom.ListenPortfolio("BP15102-MO-01");
+                        SmartCom.SetPortfolio += AddPortfolio;
+                    }
+                    catch (Exception ex)
+                    {
+                        label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
+                    }
+                   
+                }));
+            }          
                        
         }
         /// <summary>
@@ -117,7 +133,16 @@ namespace ATP
         /// <param name="totalAssets"></param>
         private void AddPortfolio(string portfolio, double cash, double leverage, double comission, double saldo, double liquidationValue, double initialMargin, double totalAssets)
         {
-            Portf.Add(new Collections.Portfolio(portfolio, cash, leverage, comission, saldo, liquidationValue, initialMargin, totalAssets));
+            if(InvokeRequired)
+            {
+                BeginInvoke(new MethodInvoker(delegate 
+                {
+                    Portf.Add(new Collections.Portfolio(portfolio, cash, leverage, comission, saldo, liquidationValue, initialMargin, totalAssets));
+                    label5.Text = cash.ToString("# ###.#")+"  руб.";
+                    label8.Text = saldo.ToString("# ###.#") + "  руб.";
+                }));
+            }
+            
         }
         /// <summary>
         /// Метод очистки поля ввода инструмента
