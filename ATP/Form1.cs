@@ -261,10 +261,9 @@ namespace ATP
                     chart1.Series[0].Points.AddXY(date, open, high, low, close);
                     if(BarsList.Count>0)
                     {
-                        MessageBox.Show(BarsList.Where(p => p.Low > 0).Min(p => p.Low).ToString());
-                    }                    
-                    //BarsList.Where(p => p.Low != 0).Min(p => p.Low).ToString();
-                    //chart1.ChartAreas[0].AxisY.Minimum = 
+                        chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[0])-(Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[1])- chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[2])));
+                    }                   
+                                       
             }));
             }
         }
