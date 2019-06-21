@@ -11,11 +11,11 @@ namespace ATP.Collections
     /// </summary>
     public class Bar
     {
-        DateTime Date { get; set; }
-        double Open { get; set; }
-        double High { get; set; }
-        double Low { get; set; }
-        double Close { get; set; }       
+        public DateTime Date { get; set; }
+        public double Open { get; set; }
+        public double High { get; set; }
+        public double Low { get; set; }
+        public double Close { get; set; }       
 
         /// <summary>
         /// Метод-конструктор экземпляра бар
