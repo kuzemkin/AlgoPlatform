@@ -233,8 +233,39 @@ namespace ATP
             try
             {
                 SmartCom.GetBars(symbol, interval, DateTime.Today, 100);
+                SmartCom.AddBar += AddBars;
             }
             catch { label3.Text = $"[{DateTime.Now}]: Возникла ошибка!"; }
+        }
+        /// <summary>
+        /// Метод добавления бара в список баров
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="nrows"></param>
+        /// <param name="symbol"></param>
+        /// <param name="interval"></param>
+        /// <param name="date"></param>
+        /// <param name="open"></param>
+        /// <param name="high"></param>
+        /// <param name="low"></param>
+        /// <param name="close"></param>
+        /// <param name="volume"></param>
+        /// <param name="open_int"></param>
+        private void AddBars(int row, int nrows, string symbol, StBarInterval interval, DateTime date, double open, double high, double low, double close, double volume, double open_int)
+        {
+            if(InvokeRequired)
+            {
+                BeginInvoke(new MethodInvoker(delegate
+                {
+                    BarsList.Add(new Collections.Bar(date, open, high, low, close));
+                    chart1.Series[0].Points.AddXY(date, open, high, low, close);
+                    if(BarsList.Count>0)
+                    {
+                        chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[0])-(Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[1])- chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[2])));
+                    }                   
+                                       
+            }));
+            }
         }
     }
 }
