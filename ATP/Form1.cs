@@ -40,8 +40,8 @@ namespace ATP
         /// <param name="e"></param>
         private void LostFocus1_Method(object sender, EventArgs e)
         {
-            Login = textBox1.Text;
-            
+            //Login = textBox1.Text;
+            Login = "kuziomkin";
         }
         /// <summary>
         /// Метод инициализации поля Password
@@ -50,8 +50,8 @@ namespace ATP
         /// <param name="e"></param>
         private void LostFocus2_Method(object sender, EventArgs e)
         {
-            Password = textBox2.Text;
-           
+            //Password = textBox2.Text;
+            Password = "QJHAWU";
         }
         /// <summary>
         /// Метод подключения к серверу
