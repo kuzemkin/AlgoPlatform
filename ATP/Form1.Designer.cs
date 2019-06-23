@@ -263,13 +263,21 @@
             // 
             // chart1
             // 
+            this.chart1.AccessibleRole = System.Windows.Forms.AccessibleRole.ScrollBar;
+            chartArea1.AxisX.MajorGrid.LineColor = System.Drawing.Color.Gray;
+            chartArea1.AxisY.MajorGrid.LineColor = System.Drawing.Color.Gray;
+            chartArea1.BackSecondaryColor = System.Drawing.Color.Gray;
+            chartArea1.BorderColor = System.Drawing.Color.Gray;
             chartArea1.Name = "ChartArea1";
             this.chart1.ChartAreas.Add(chartArea1);
             this.chart1.Location = new System.Drawing.Point(0, 50);
             this.chart1.Name = "chart1";
             series1.ChartArea = "ChartArea1";
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Candlestick;
+            series1.Color = System.Drawing.Color.Black;
+            series1.CustomProperties = "PriceDownColor=Red, PriceUpColor=Black";
             series1.Name = "Series1";
+            series1.ShadowColor = System.Drawing.Color.Black;
             series1.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
             series1.YValuesPerPoint = 4;
             series1.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;

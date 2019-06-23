@@ -230,6 +230,14 @@ namespace ATP
         /// <param name="e"></param>
         private void button2_Click(object sender, EventArgs e)
         {
+            if(InvokeRequired)
+            {
+                BeginInvoke(new MethodInvoker(delegate
+                {
+                    chart1.Series[0].Points.Clear();
+                    Refresh();
+                }));
+            }            
             try
             {
                 SmartCom.GetBars(symbol, interval, DateTime.Today, 100);
@@ -258,10 +266,10 @@ namespace ATP
                 BeginInvoke(new MethodInvoker(delegate
                 {
                     BarsList.Add(new Collections.Bar(date, open, high, low, close));
-                    chart1.Series[0].Points.AddXY(date, open, high, low, close);
+                    chart1.Series[0].Points.AddXY(date, high, low, close, open);
                     if(BarsList.Count>0)
                     {
-                        chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[0])-(Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[1])- chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[2])));
+                        chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])-(Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[0])- chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])));
                     }                   
                                        
             }));
