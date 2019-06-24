@@ -263,7 +263,7 @@
             // 
             // chart1
             // 
-            this.chart1.AccessibleRole = System.Windows.Forms.AccessibleRole.ScrollBar;
+            this.chart1.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
             chartArea1.AxisX.MajorGrid.LineColor = System.Drawing.Color.Gray;
             chartArea1.AxisY.MajorGrid.LineColor = System.Drawing.Color.Gray;
             chartArea1.BackSecondaryColor = System.Drawing.Color.Gray;
@@ -272,6 +272,7 @@
             this.chart1.ChartAreas.Add(chartArea1);
             this.chart1.Location = new System.Drawing.Point(0, 50);
             this.chart1.Name = "chart1";
+            series1.BorderColor = System.Drawing.Color.Black;
             series1.ChartArea = "ChartArea1";
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Candlestick;
             series1.Color = System.Drawing.Color.Black;
@@ -285,6 +286,7 @@
             this.chart1.Size = new System.Drawing.Size(792, 371);
             this.chart1.TabIndex = 0;
             this.chart1.Text = "chart1";
+            
             // 
             // Form1
             // 

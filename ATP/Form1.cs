@@ -230,14 +230,10 @@ namespace ATP
         /// <param name="e"></param>
         private void button2_Click(object sender, EventArgs e)
         {
-            if(InvokeRequired)
+            if(chart1.Series[0].Points.Count()>0)
             {
-                BeginInvoke(new MethodInvoker(delegate
-                {
-                    chart1.Series[0].Points.Clear();
-                    Refresh();
-                }));
-            }            
+                chart1.Series[0].Points.Clear();                
+            }                
             try
             {
                 SmartCom.GetBars(symbol, interval, DateTime.Today, 100);
