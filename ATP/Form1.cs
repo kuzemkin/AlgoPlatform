@@ -269,7 +269,11 @@ namespace ATP
                     }                   
                                        
             }));
-            }            
+            }
+            if(BarsList.Count()>0)
+            {
+                MessageBox.Show(BarsList.Max().ToString());
+            }
         }
     }
 }

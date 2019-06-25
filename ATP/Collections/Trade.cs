@@ -20,19 +20,30 @@ namespace ATP.Collections
         {
             InProgress=0,
             Active=1,
-            Close
+            Close=2
         }
         OrderState State { get; set; }
         double Amount { get; set; }
-        int Id { get; set; }           
-        public Trade(double openPrice, double closePrice, OrderType order, OrderState state, double amount, int id)
+        double Result
+        {            
+            set
+            {
+                if (Order == OrderType.Buy)
+                {
+                    Result = ClosePrice - OpenPrice;
+                }
+                else Result = OpenPrice - ClosePrice;
+            }
+            get { return Result; }
+        }
+              
+        public Trade(double openPrice, OrderType order, double amount)
         {
             OpenPrice = openPrice;
-            ClosePrice = closePrice;
             Order = order;
-            State = state;
             Amount = amount;
-            Id = id;
+            ClosePrice = 0;
+            State = OrderState.Active;
         }
     }
 }
