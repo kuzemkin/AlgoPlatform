@@ -261,7 +261,7 @@ namespace ATP
             {
                 BeginInvoke(new MethodInvoker(delegate
                 {
-                    BarsList.Add(new Collections.Bar(date, open, high, low, close));
+                    BarsList.Add(new Collections.Bar(date, open, high, low, close)); 
                     chart1.Series[0].Points.AddXY(date, high, low, close, open);
                     if(BarsList.Count>0)
                     {
@@ -269,7 +269,7 @@ namespace ATP
                     }                   
                                        
             }));
-            }
+            }            
         }
     }
 }
