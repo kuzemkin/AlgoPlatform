@@ -27,11 +27,11 @@ namespace ATP.Collections
         /// <param name="close"></param>
         public Bar(DateTime date, double open, double high, double low, double close)
         {
-            Date = Date;
-            Open = Open;
-            High = High;
-            Low = Low;
-            Close = Close;
+            Date = date;
+            Open = open;
+            High = high;
+            Low = low;
+            Close = close;
         }
     }
 }

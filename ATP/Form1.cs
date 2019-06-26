@@ -24,8 +24,9 @@ namespace ATP
         private string Password {get; set;}
         public string symbol = "SBER";
         public StBarInterval interval = StBarInterval.StBarInterval_1Min;
-        public List<ATP.Collections.Bar> BarsList= new List<Collections.Bar>();
-        public List<ATP.Collections.Portfolio> Portf = new List<Collections.Portfolio>();
+        public List<Collections.Bar> BarsList= new List<Collections.Bar>();
+        public List<Collections.Portfolio> PortfList = new List<Collections.Portfolio>();
+        public List<Collections.Trade> TradesList = new List<Collections.Trade>();
         /// <summary>
         /// Инициалезация компонентов
         /// </summary>
@@ -137,7 +138,7 @@ namespace ATP
             {
                 BeginInvoke(new MethodInvoker(delegate 
                 {
-                    Portf.Add(new Collections.Portfolio(portfolio, cash, leverage, comission, saldo, liquidationValue, initialMargin, totalAssets));
+                    PortfList.Add(new Collections.Portfolio(portfolio, cash, leverage, comission, saldo, liquidationValue, initialMargin, totalAssets));
                     label5.Text = cash.ToString("# ###.#")+"  руб.";
                     label8.Text = saldo.ToString("# ###.#") + "  руб.";
                 }));
@@ -257,23 +258,38 @@ namespace ATP
         /// <param name="open_int"></param>
         private void AddBars(int row, int nrows, string symbol, StBarInterval interval, DateTime date, double open, double high, double low, double close, double volume, double open_int)
         {
-            if(InvokeRequired)
+            BarsList.Add(new Collections.Bar(date, open, high, low, close));
+            //
+            //ниже представлена инстуркция, регулирующая масштаб графика
+            //
+            if (InvokeRequired)
             {
                 BeginInvoke(new MethodInvoker(delegate
-                {
-                    BarsList.Add(new Collections.Bar(date, open, high, low, close)); 
+                {                    
                     chart1.Series[0].Points.AddXY(date, high, low, close, open);
                     if(BarsList.Count>0)
-                    {
-                        chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])-(Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[0])- chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])));
-                    }                   
+                    {                        
+                       chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])-(Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[0])- chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])));
+                    }                 
                                        
             }));
-            }
-            if(BarsList.Count()>0)
+            }             
+        }    
+        /// <summary>
+        /// Метод создания трейда при соблюдении условий
+        /// </summary>
+        /// <param name="b"></param>
+        public void Strategy1(List<Collections.Bar> b)
+        {
+            for(int i=0; i<b.Count(); i++)
             {
-                MessageBox.Show(BarsList.Max().ToString());
+                if(b[i+15+1].Close> b.GetRange(i, 15).Select(p => p.High).Max())
+                {
+                    TradesList.Add(new Collections.Trade(b[i + 15 + 2].Open, Collections.Trade.OrderType.Buy, b[i + 15 + 2].Open));
+                }                
             }
+            
         }
+      
     }
 }
