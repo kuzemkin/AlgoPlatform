@@ -269,6 +269,10 @@
             chartArea1.AxisY.MajorGrid.LineColor = System.Drawing.Color.Gray;
             chartArea1.BackSecondaryColor = System.Drawing.Color.Gray;
             chartArea1.BorderColor = System.Drawing.Color.Gray;
+            chartArea1.CursorX.IsUserEnabled = true;
+            chartArea1.CursorX.IsUserSelectionEnabled = true;
+            chartArea1.CursorY.IsUserEnabled = true;
+            chartArea1.CursorY.IsUserSelectionEnabled = true;
             chartArea1.Name = "ChartArea1";
             this.chart1.ChartAreas.Add(chartArea1);
             this.chart1.Location = new System.Drawing.Point(0, 50);
@@ -278,6 +282,7 @@
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Candlestick;
             series1.Color = System.Drawing.Color.Black;
             series1.CustomProperties = "PriceDownColor=Red, PriceUpColor=Black";
+            series1.IsVisibleInLegend = false;
             series1.Name = "Series1";
             series1.ShadowColor = System.Drawing.Color.Black;
             series1.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
@@ -285,6 +290,7 @@
             series1.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
             series2.ChartArea = "ChartArea1";
             series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            series2.IsValueShownAsLabel = true;
             series2.Name = "Series2";
             series2.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
             series2.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;

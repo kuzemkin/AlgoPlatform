@@ -38,12 +38,12 @@ namespace ATP.Collections
             get { return Result; }
         }
               
-        public Trade(DateTime date, double openPrice, OrderType order, double amount)
+        public Trade(DateTime date, double openPrice, OrderType order)
         {
             Date = date;
             OpenPrice = openPrice;
             Order = order;
-            Amount = amount;            
+            Amount = 1;            
             ClosePrice = 0;
             State = OrderState.Active;
         }

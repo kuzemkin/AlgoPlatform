@@ -237,7 +237,7 @@ namespace ATP
             }                
             try
             {
-                SmartCom.GetBars(symbol, interval, DateTime.Today, 100);
+                SmartCom.GetBars(symbol, interval, new DateTime(DateTime.Today.Year,DateTime.Today.Month,DateTime.Today.Day-10), -100);
                 SmartCom.AddBar += AddBars;
             }
             catch { label3.Text = $"[{DateTime.Now}]: Возникла ошибка!"; }
@@ -266,7 +266,7 @@ namespace ATP
             {
                 BeginInvoke(new MethodInvoker(delegate
                 {                    
-                    chart1.Series[0].Points.AddXY(date, high, low, close, open);
+                    chart1.Series[0].Points.AddXY(date, high, low, open, close);
                     if(BarsList.Count>0)
                     {                        
                        chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])-(Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[0])- chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])));
@@ -281,7 +281,7 @@ namespace ATP
         /// </summary>
         /// <param name="b"></param>
         public void Strategy1(List<Collections.Bar> b, List<Collections.Trade> t)
-        {
+        {            
             if((t.Where(tr => tr.State == Collections.Trade.OrderState.Active).Count() > 0))
             {
                
@@ -292,12 +292,12 @@ namespace ATP
                 {
                     if (b[i + 15 + 1].Close > b.GetRange(i, 15).Select(p => p.High).Max())
                     {
-                        TradesList.Add(new Collections.Trade(b[i + 15 + 2].Date, b[i + 15 + 2].Open, Collections.Trade.OrderType.Buy, b[i + 15 + 2].Open));
+                        TradesList.Add(new Collections.Trade(b[i + 15 + 2].Date, b[i + 15 + 2].Open, Collections.Trade.OrderType.Buy));
                         if (InvokeRequired)
                         {
                             BeginInvoke(new MethodInvoker(delegate
                             {
-                                chart1.Series[1].Points.AddXY(TradesList.Last().Date, TradesList.Last().OpenPrice);
+                                chart1.Series[1].Points.AddXY(b[i + 15 + 2].Date, b[i + 15 + 2].Open);
                             }));
                         }
                     }
