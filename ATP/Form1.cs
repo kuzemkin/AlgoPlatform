@@ -273,22 +273,37 @@ namespace ATP
                     }                 
                                        
             }));
-            }             
+            }
+            Strategy1(BarsList, TradesList);
         }    
         /// <summary>
         /// Метод создания трейда при соблюдении условий
         /// </summary>
         /// <param name="b"></param>
-        public void Strategy1(List<Collections.Bar> b)
+        public void Strategy1(List<Collections.Bar> b, List<Collections.Trade> t)
         {
-            for(int i=0; i<b.Count(); i++)
+            if((t.Where(tr => tr.State == Collections.Trade.OrderState.Active).Count() > 0))
             {
-                if(b[i+15+1].Close> b.GetRange(i, 15).Select(p => p.High).Max())
+               
+            } 
+            else
+            {
+                for (int i = 0; i < b.Count() & i+15+2<b.Count(); i++)
                 {
-                    TradesList.Add(new Collections.Trade(b[i + 15 + 2].Open, Collections.Trade.OrderType.Buy, b[i + 15 + 2].Open));
-                }                
+                    if (b[i + 15 + 1].Close > b.GetRange(i, 15).Select(p => p.High).Max())
+                    {
+                        TradesList.Add(new Collections.Trade(b[i + 15 + 2].Date, b[i + 15 + 2].Open, Collections.Trade.OrderType.Buy, b[i + 15 + 2].Open));
+                        if (InvokeRequired)
+                        {
+                            BeginInvoke(new MethodInvoker(delegate
+                            {
+                                chart1.Series[1].Points.AddXY(TradesList.Last().Date, TradesList.Last().OpenPrice);
+                            }));
+                        }
+                    }
+                }
             }
-            
+                       
         }
       
     }
