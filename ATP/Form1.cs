@@ -27,6 +27,7 @@ namespace ATP
         public List<Collections.Bar> BarsList= new List<Collections.Bar>();
         public List<Collections.Portfolio> PortfList = new List<Collections.Portfolio>();
         public List<Collections.Trade> TradesList = new List<Collections.Trade>();
+        int n = 100;            //количество запрашиваемых баров
         /// <summary>
         /// Инициалезация компонентов
         /// </summary>
@@ -214,7 +215,7 @@ namespace ATP
                     }
                 case "1 день":
                     {
-                        interval = StBarInterval.StBarInterval_Month;
+                        interval = StBarInterval.StBarInterval_Day;
                         break;
                     }
                 case "1 неделя":
@@ -230,17 +231,58 @@ namespace ATP
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void button2_Click(object sender, EventArgs e)
-        {
-            if(chart1.Series[0].Points.Count()>0)
-            {
-                chart1.Series[0].Points.Clear();                
-            }                
+        {            
+            chart1.Series[0].Points.Clear();            
+
             try
             {
-                SmartCom.GetBars(symbol, interval, new DateTime(DateTime.Today.Year,DateTime.Today.Month,DateTime.Today.Day-10), -100);
+                SmartCom.GetBars(symbol, interval, new DateTime(SetDateTime(interval,n).Year, SetDateTime(interval, n).Month, SetDateTime(interval, n).Day, SetDateTime(interval, n).Hour, SetDateTime(interval, n).Minute, SetDateTime(interval, n).Second), -n);
                 SmartCom.AddBar += AddBars;
             }
             catch { label3.Text = $"[{DateTime.Now}]: Возникла ошибка!"; }
+        }
+        public static DateTime SetDateTime(StBarInterval interval, int n)
+        {
+            DateTime setdate=new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+            switch (interval)
+            {
+                case StBarInterval.StBarInterval_1Min:
+                    if(n<60)
+                    {
+                        setdate = setdate.AddMinutes(-n);
+                    }
+                    else
+                    {
+                        setdate = setdate.AddHours(-(n / 60));
+                        setdate = setdate.AddMinutes(-(n % 60));
+                    }
+                    break;
+                case StBarInterval.StBarInterval_5Min:
+                    setdate = setdate.AddMinutes(-n*5);
+                    break;
+                case StBarInterval.StBarInterval_15Min:
+                    setdate = setdate.AddMinutes(-n*15);
+                    break;
+                case StBarInterval.StBarInterval_30Min:
+                    setdate = setdate.AddMinutes(-n*30);
+                    break;
+                case StBarInterval.StBarInterval_60Min:
+                    setdate = setdate.AddMinutes(-n*60);
+                    break;
+                case StBarInterval.StBarInterval_2Hour:
+                    setdate = setdate.AddHours(-n*2);
+                    break;
+                case StBarInterval.StBarInterval_4Hour:
+                    setdate = setdate.AddHours(-n * 4);
+                    break; 
+                case StBarInterval.StBarInterval_Day:
+                    setdate=setdate.AddDays(-n );
+                    break;
+                case StBarInterval.StBarInterval_Week:
+                    setdate = setdate.AddDays(-n*7);
+                    break;
+            }
+            return setdate;
         }
         /// <summary>
         /// Метод добавления бара в список баров
@@ -284,23 +326,43 @@ namespace ATP
         {            
             if((t.Where(tr => tr.State == Collections.Trade.OrderState.Active).Count() > 0))
             {
-               
-            } 
+                //int n = b.FindIndex(p => p.Date == t.FindLast(v => v.State == Collections.Trade.OrderState.Active).Date);
+                //for (int i = 0; i + 15 + 2 + n < b.Count(); i++)
+                //{
+                //    if (b[i + 15 + 1 + n].Close < b.GetRange(i + n, 15).Select(p => p.Low).Min())
+                //    {
+                //        t.FindLast(v => v.State == Collections.Trade.OrderState.Active).ClosePrice = b[i + 15 + 2 + n].Open;
+                //        if (InvokeRequired)
+                //        {
+                //            BeginInvoke(new MethodInvoker(delegate
+                //            {
+                //                chart1.Series[1].Points.AddXY(b[i + 15 + 2 + n].Date, b[i + 15 + 2 + n].Open);
+                //                // chart1.Series[2].Points.AddXY(t.FindLast(v => v.State == Collections.Trade.OrderState.Active).OpenPrice, t.FindLast(v => v.State == Collections.Trade.OrderState.Active).ClosePrice);
+                //            }));
+                //        }
+                //        t.FindLast(v => v.State == Collections.Trade.OrderState.Active).State = Collections.Trade.OrderState.Close;
+                //    }
+                //}
+            }
             else
             {
-                for (int i = 0; i < b.Count() & i+15+2<b.Count(); i++)
+                for (int i = 0; i+17<b.Count(); i++)
                 {
-                    if (b[i + 15 + 1].Close > b.GetRange(i, 15).Select(p => p.High).Max())
+                    if(b[i+15].Close> b.GetRange(i, 15).Select(p => p.High).Max())
                     {
-                        TradesList.Add(new Collections.Trade(b[i + 15 + 2].Date, b[i + 15 + 2].Open, Collections.Trade.OrderType.Buy));
+                        t.Add(new Collections.Trade(b[i + 16].Date, b[i + 16].Open, Collections.Trade.OrderType.Buy));
                         if (InvokeRequired)
                         {
                             BeginInvoke(new MethodInvoker(delegate
                             {
-                                chart1.Series[1].Points.AddXY(b[i + 15 + 2].Date, b[i + 15 + 2].Open);
+                                if(i+17<b.Count)
+                                {
+                                    chart1.Series[1].Points.AddXY(b[i+15].Date, b[i+15].Open);
+                                }                                
                             }));
                         }
                     }
+                    
                 }
             }
                        
