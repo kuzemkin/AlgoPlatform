@@ -270,6 +270,7 @@
             chartArea1.AxisY.MajorGrid.LineColor = System.Drawing.Color.Gray;
             chartArea1.BackSecondaryColor = System.Drawing.Color.Gray;
             chartArea1.BorderColor = System.Drawing.Color.Gray;
+            chartArea1.CursorX.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Minutes;
             chartArea1.CursorX.IsUserEnabled = true;
             chartArea1.CursorX.IsUserSelectionEnabled = true;
             chartArea1.CursorY.IsUserEnabled = true;
