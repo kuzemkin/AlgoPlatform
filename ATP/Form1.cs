@@ -27,7 +27,7 @@ namespace ATP
         public List<Collections.Bar> BarsList= new List<Collections.Bar>();
         public List<Collections.Portfolio> PortfList = new List<Collections.Portfolio>();
         public List<Collections.Trade> TradesList = new List<Collections.Trade>();
-        int n = 200;            //количество запрашиваемых баров
+        int n = 200;            //количество запрашиваемых баров     
         /// <summary>
         /// Инициалезация компонентов
         /// </summary>
@@ -318,10 +318,10 @@ namespace ATP
         /// <param name="b"></param>
         public void Strategy1(List<Collections.Bar> b, List<Collections.Trade> t)
         {            
-            if((t.Where(tr => tr.State == Collections.Trade.OrderState.Active).Select(n=>n).Count() > 0))
+            if ((t.Where(tr => tr.State == Collections.Trade.OrderState.Active).Select(n=>n).Count() > 0))
             {
-                int n = b.FindLastIndex(p => p.Date == t.FindLast(v => v.State == Collections.Trade.OrderState.Active).Date);
-                for (int i = n; i + 16 < b.Count(); i++)
+                int n = b.FindLastIndex(p => p.Date == t.Last().Date);
+                for (int i = n; i + 15 < b.Count(); i++)
                 {
                     if (b[i + 15].Close < b.GetRange(i, 15).Select(p => p.Low).Min())
                     {
@@ -330,7 +330,7 @@ namespace ATP
                         {
                             BeginInvoke(new MethodInvoker(delegate
                             {
-                                if(b.Count>i+15)
+                                if (b.Count > i + 15)
                                 {
                                     chart1.Series[1].Points.AddXY(b[i + 15].Date, b[i + 15].Open);
                                     chart1.Series[2].Points.AddXY(b[i + 15].Date, b[i + 15].Open);
@@ -345,7 +345,7 @@ namespace ATP
             {
                 if (t.Count > 0)
                 {
-                    int n = b.FindLastIndex(p => p.Date == t.FindLast(v => v.State == Collections.Trade.OrderState.Close).Date);
+                    int n = b.FindLastIndex(p => p.Date == t.Last().Date);
                 }
                 else n = 0;
                 
@@ -353,14 +353,14 @@ namespace ATP
                 {
                     if(b[i+15].Close> b.GetRange(i, 15).Select(p => p.High).Max())
                     {
-                        t.Add(new Collections.Trade(b[i + 15].Date, b[i + 15].Open, Collections.Trade.OrderType.Buy));
+                        t.Add(new Collections.Trade(b[i + 15].Date, b[i + 15].Open, Collections.Trade.OrderType.Buy));                        
                         if (InvokeRequired)
                         {
                             BeginInvoke(new MethodInvoker(delegate
-                            {
-                                if(b.Count>i+15)
-                                {
-                                    chart1.Series[1].Points.AddXY(b[i + 15].Date, b[i + 15].Open);
+                            {                                
+                                if (b.Count>i+15)
+                                {                                     
+                                    chart1.Series[1].Points.AddXY(b[i + 15].Date, b[i + 15].Open);                                    
                                     chart1.Series[2].Points.AddXY(b[i + 15].Date, b[i + 15].Open);
                                 }
                                
