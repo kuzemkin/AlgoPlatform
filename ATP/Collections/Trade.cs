@@ -8,7 +8,8 @@ namespace ATP.Collections
 {    
     public class Trade
     {
-        public DateTime Date { get; set; }
+        public DateTime OpenDate { get; set; }
+        public DateTime CloseDate { get; set; }
         public double OpenPrice { get; set; }
         public double ClosePrice { get; set; }
         public enum OrderType
@@ -40,7 +41,7 @@ namespace ATP.Collections
               
         public Trade(DateTime date, double openPrice, OrderType order)
         {
-            Date = date;
+            OpenDate = date;
             OpenPrice = openPrice;
             Order = order;
             Amount = 1;            
