@@ -27,7 +27,7 @@ namespace ATP
         public List<Collections.Bar> BarsList= new List<Collections.Bar>();
         public List<Collections.Portfolio> PortfList = new List<Collections.Portfolio>();
         public List<Collections.Trade> TradesList = new List<Collections.Trade>();
-        int n = 200;            //количество запрашиваемых баров     
+        int n = 200;            //количество запрашиваемых баров   фф    
         /// <summary>
         /// Инициалезация компонентов
         /// </summary>
