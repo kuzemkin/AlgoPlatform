@@ -338,7 +338,7 @@ namespace ATP
                             {
                                 BeginInvoke(new MethodInvoker(delegate
                                 {
-                                    if (b.Count > i)
+                                    if (b.Count > i+15)
                                     {
                                         chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);
                                         chart1.Series[2].Points.AddXY(b[i].Date, b[i].Open);
