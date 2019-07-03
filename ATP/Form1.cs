@@ -259,6 +259,9 @@ namespace ATP
                 case StBarInterval.StBarInterval_5Min:
                     setdate = setdate.AddMinutes(-n * 5);
                     break;
+                case StBarInterval.StBarInterval_10Min:
+                    setdate = setdate.AddMinutes(-n * 10);
+                    break;
                 case StBarInterval.StBarInterval_15Min:
                     setdate = setdate.AddMinutes(-n * 15);
                     break;
@@ -327,7 +330,7 @@ namespace ATP
             {
                 for (int l=ind, i = ind + 15; i < b.Count(); i++, l++)
                 {
-                    if (b[i].Close < b.GetRange(l, 15).Select(p => p.Low).Min())
+                    if (b[i].Close < b.GetRange(l-15, 15).Select(p => p.Low).Min())
                     {
                         t.Last().ClosePrice = b[i].Open;
                         t.Last().CloseDate = b[i].Date;
