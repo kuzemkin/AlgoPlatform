@@ -26,26 +26,14 @@ namespace ATP.Collections
         }
         public OrderState State { get; set; }
         public double Amount { get; set; }
-        public double Result
-        {            
-            set
-            {
-                if (Order == OrderType.Buy)
-                {
-                    Result = ClosePrice - OpenPrice;
-                }
-                else Result = OpenPrice - ClosePrice;
-            }
-            get { return Result; }
-        }
+        public double Result { get; set; }        
               
         public Trade(DateTime date, double openPrice, OrderType order)
         {
             OpenDate = date;
             OpenPrice = openPrice;
             Order = order;
-            Amount = 1;            
-            ClosePrice = 0;
+            Amount = 1;          
             State = OrderState.Active;
         }
     }
