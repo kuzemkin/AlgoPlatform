@@ -323,50 +323,57 @@ namespace ATP
         /// <param name="b"></param>
         public void Strategy1(List<Collections.Bar> b, List<Collections.Trade> t)
         {            
-            if (t.Count()>0 && t.Last().State==Collections.Trade.OrderState.Active)
+            if ((t.Where(tr => tr.State == Collections.Trade.OrderState.Active).Select(n=>n).Count() > 0))
             {
-                for (int l=ind, i = ind + 15; i < b.Count(); i++, l++)
+               ind = b.FindLastIndex(p => p.Date == t.Last().OpenDate);
+                for(int d=ind; d+15<b.Count(); d=d+15)
                 {
-                    if (b[i].Close < b.GetRange(l, 15).Select(p => p.Low).Min())
+                    for (int i = ind + 15; i < b.Count(); i++)
                     {
-                        t.Last().ClosePrice = b[i].Open;
-                        t.Last().CloseDate = b[i].Date;
-                        if (InvokeRequired)
+                        if (b[i].Close < b.GetRange(d, 15).Select(p => p.Low).Min())
                         {
-                            BeginInvoke(new MethodInvoker(delegate
+                            t.Last().ClosePrice = b[i].Open;
+                            t.Last().CloseDate = b[i].Date;
+                            if (InvokeRequired)
                             {
-                                if (b.Count > i + 15)
+                                BeginInvoke(new MethodInvoker(delegate
                                 {
-                                    chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);
-                                    chart1.Series[2].Points.AddXY(b[i].Date, b[i].Open);
-                                }
-                            }));
+                                    if (b.Count > i+15)
+                                    {
+                                        chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);
+                                        chart1.Series[2].Points.AddXY(b[i].Date, b[i].Open);
+                                    }
+                                }));
+                            }
+                            t.Last().State = Collections.Trade.OrderState.Close;
+                            ind = b.FindLastIndex(p => p.Date == t.Last().CloseDate);
                         }
-                        t.Last().State = Collections.Trade.OrderState.Close;
-                        ind = b.FindLastIndex(p => p.Date == t.Last().CloseDate);
                     }
                 }
             }
             else
-            {
-                for (int l = ind, i = ind + 15; i < b.Count(); i++, l++)
+            {                           
+               for(int d=ind; d+15<b.Count(); d=d+15)
                 {
-                    if (b[i].Close > b.GetRange(l, 15).Select(p => p.High).Max())
+                    for (int i = ind + 15; i < b.Count(); i++)
                     {
-                        t.Add(new Collections.Trade(b[i].Date, b[i].Open, Collections.Trade.OrderType.Buy));
-                        if (InvokeRequired)
+                        if (b[i].Close > b.GetRange(d, 15).Select(p => p.High).Max())
                         {
-                            BeginInvoke(new MethodInvoker(delegate
+                            t.Add(new Collections.Trade(b[i].Date, b[i].Open, Collections.Trade.OrderType.Buy));
+                            if (InvokeRequired)
                             {
-                                if (b.Count > i + 15)
+                                BeginInvoke(new MethodInvoker(delegate
                                 {
-                                    chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);
-                                    chart1.Series[2].Points.AddXY(b[i].Date, b[i].Open);
-                                }
+                                    if (b.Count > i + 15)
+                                    {
+                                        chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);
+                                        chart1.Series[2].Points.AddXY(b[i].Date, b[i].Open);
+                                    }
 
-                            }));
+                                }));
+                            }
                         }
-                        ind = b.FindLastIndex(p => p.Date == t.Last().OpenDate);
+
                     }
                 }
             }
