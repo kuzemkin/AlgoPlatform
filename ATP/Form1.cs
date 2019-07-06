@@ -29,6 +29,7 @@ namespace ATP
         public List<Collections.Trade> TradesList = new List<Collections.Trade>();
         public int n = 100;            //количество запрашиваемых баров 
         public int ind = 15;             //индекс 
+        private object TreadLock = new object();
         /// <summary>
         /// Инициалезация компонентов
         /// </summary>
@@ -253,6 +254,7 @@ namespace ATP
             chart1.Series[0].Points.Clear();
             chart1.Series[1].Points.Clear();
             chart1.Series[2].Points.Clear();
+            chart2.Series[0].Points.Clear();
 
             try
             {
@@ -345,9 +347,13 @@ namespace ATP
                 {
                     if (b[i].Close < b.GetRange(l, 15).Select(p => p.Low).Min())
                     {
-                        t.Last().ClosePrice = b[i].Open;
-                        t.Last().CloseDate = b[i].Date;
-                        t.Last().Result = t.Last().ClosePrice - t.Last().OpenPrice;
+                        lock(TreadLock)
+                        {
+                            t.Last().ClosePrice = b[i].Open;
+                            t.Last().CloseDate = b[i].Date;
+                            t.Last().Result = t.Last().ClosePrice - t.Last().OpenPrice;
+                            t.Last().State = Collections.Trade.OrderState.Close;
+                        }
                         if (InvokeRequired)
                         {
                             BeginInvoke(new MethodInvoker(delegate
@@ -355,15 +361,16 @@ namespace ATP
                                 label12.Text = t.Where(n => n.Result > 0).Select(m => m).Count().ToString();
                                 label14.Text = t.Where(n => n.Result < 0).Select(m => m).Count().ToString();
                                 label16.Text = Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum()).ToString();
+                                chart2.Series[0].Points.AddXY(t.Last().CloseDate, Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum()));
                                 if (b.Count > i)
                                 {
                                     chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);
-                                    chart1.Series[2].Points.AddXY(b[i].Date, b[i].Open);
+                                    chart1.Series[2].Points.AddXY(b[i].Date, b[i].Open);                                    
                                 }
+
                             }));
-                        }
-                        t.Last().State = Collections.Trade.OrderState.Close;
-                        ind = b.FindLastIndex(p => p.Date == t.Last().CloseDate);
+                        }          
+                        ind = b.FindLastIndex(p => p.Date == t.Last().CloseDate);                         
                     }
                 }
             }
@@ -375,7 +382,10 @@ namespace ATP
                     {
                         if (b[i].Close > b.GetRange(l, 15).Select(p => p.High).Max())
                         {
-                            t.Add(new Collections.Trade(b[i].Date, b[i].Open, Collections.Trade.OrderType.Buy));
+                            lock(TreadLock)
+                            {
+                                t.Add(new Collections.Trade(b[i].Date, b[i].Open, Collections.Trade.OrderType.Buy));
+                            }
                             if (InvokeRequired)
                             {
                                 BeginInvoke(new MethodInvoker(delegate
