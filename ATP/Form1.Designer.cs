@@ -47,6 +47,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.label17 = new System.Windows.Forms.Label();
+            this.textBox4 = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
@@ -213,6 +215,8 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.label17);
+            this.tabPage2.Controls.Add(this.textBox4);
             this.tabPage2.Controls.Add(this.button2);
             this.tabPage2.Controls.Add(this.comboBox1);
             this.tabPage2.Controls.Add(this.textBox3);
@@ -225,6 +229,25 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "График";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(487, 20);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(133, 17);
+            this.label17.TabIndex = 5;
+            this.label17.Text = "Количество баров:";
+            // 
+            // textBox4
+            // 
+            this.textBox4.Location = new System.Drawing.Point(626, 20);
+            this.textBox4.Name = "textBox4";
+            this.textBox4.Size = new System.Drawing.Size(47, 22);
+            this.textBox4.TabIndex = 0;
+            this.textBox4.Text = "100";
+            this.textBox4.GotFocus += new System.EventHandler(TextBox4GotFocus);
+            this.textBox4.LostFocus += new System.EventHandler(TextBox4LostFocus);
             // 
             // button2
             // 
@@ -483,6 +506,8 @@
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.TextBox textBox4;
     }
 }
 

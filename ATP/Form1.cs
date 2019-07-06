@@ -27,7 +27,7 @@ namespace ATP
         public List<Collections.Bar> BarsList= new List<Collections.Bar>();
         public List<Collections.Portfolio> PortfList = new List<Collections.Portfolio>();
         public List<Collections.Trade> TradesList = new List<Collections.Trade>();
-        public int n = 1000;            //количество запрашиваемых баров 
+        public int n = 100;            //количество запрашиваемых баров 
         public int ind = 15;             //индекс 
         /// <summary>
         /// Инициалезация компонентов
@@ -164,6 +164,19 @@ namespace ATP
         private void LostFocus3_Method(object sender, EventArgs e)
         {
             symbol = textBox3.Text;
+        }
+        /// <summary>
+        /// Метод очистки поля при фокусен на поле
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TextBox4GotFocus(object sender, EventArgs e)
+        {
+            textBox4.Text = "";
+        }
+        private void TextBox4LostFocus(object sender, EventArgs e)
+        {
+            int.TryParse(textBox4.Text, out n);
         }
         /// <summary>
         /// Метод инициалезирует поле ComboBox
