@@ -30,12 +30,18 @@ namespace ATP
         public int n = 100;            //количество запрашиваемых баров 
         public int ind = 15;             //индекс 
         private object TreadLock = new object();
+        public delegate void AddBarsDel(System.Windows.Forms.DataVisualization.Charting.SeriesCollection ser, DateTime date, double p);
+        AddBarsDel addDel;
+        public delegate void ChangeText(Label l, string st);
+        ChangeText changText;
         /// <summary>
         /// Инициалезация компонентов
         /// </summary>
         public Form1()
         {
             InitializeComponent();
+            addDel = AddToChart;
+            changText = ChangeTextMehtod;
         }
         /// <summary>
         /// Метод инициалезации поля Login
@@ -347,21 +353,19 @@ namespace ATP
                 {
                     if (b[i].Close < b.GetRange(l, 15).Select(p => p.Low).Min())
                     {
-                        lock(TreadLock)
-                        {
-                            t.Last().ClosePrice = b[i].Open;
-                            t.Last().CloseDate = b[i].Date;
-                            t.Last().Result = t.Last().ClosePrice - t.Last().OpenPrice;
-                            t.Last().State = Collections.Trade.OrderState.Close;
-                        }
+                        t.Last().ClosePrice = b[i].Open;
+                        t.Last().CloseDate = b[i].Date;
+                        t.Last().Result = t.Last().ClosePrice - t.Last().OpenPrice;
+                        t.Last().State = Collections.Trade.OrderState.Close;
+                        //Используем делегат, чтоб получит доступ к потоку
+                        changText?.Invoke(label12, t.Where(n => n.Result > 0).Select(m => m).Count().ToString());
+                        changText?.Invoke(label14, t.Where(n => n.Result < 0).Select(m => m).Count().ToString());
+                        changText?.Invoke(label16, Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum()).ToString());
                         if (InvokeRequired)
                         {
                             BeginInvoke(new MethodInvoker(delegate
-                            {
-                                label12.Text = t.Where(n => n.Result > 0).Select(m => m).Count().ToString();
-                                label14.Text = t.Where(n => n.Result < 0).Select(m => m).Count().ToString();
-                                label16.Text = Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum()).ToString();
-                                chart2.Series[0].Points.AddXY(t.Last().CloseDate, Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum()));
+                            {                                
+                                
                                 if (b.Count > i)
                                 {
                                     chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);
@@ -369,7 +373,8 @@ namespace ATP
                                 }
 
                             }));
-                        }          
+                        }
+                        addDel?.Invoke(chart2.Series, t.Last().CloseDate, t.Where(v=>v.State==Collections.Trade.OrderState.Close).Select(r=>r.Result).Sum());
                         ind = b.FindLastIndex(p => p.Date == t.Last().CloseDate);                         
                     }
                 }
@@ -382,17 +387,14 @@ namespace ATP
                     {
                         if (b[i].Close > b.GetRange(l, 15).Select(p => p.High).Max())
                         {
-                            lock(TreadLock)
-                            {
-                                t.Add(new Collections.Trade(b[i].Date, b[i].Open, Collections.Trade.OrderType.Buy));
-                            }
+                            t.Add(new Collections.Trade(b[i].Date, b[i].Open, Collections.Trade.OrderType.Buy));
                             if (InvokeRequired)
                             {
                                 BeginInvoke(new MethodInvoker(delegate
                                 {
                                     label10.Text = t.Count().ToString();
                                     if (b.Count > i)
-                                    {
+                                    {                                        
                                         chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);
                                         chart1.Series[2].Points.AddXY(b[i].Date, b[i].Open);
                                     }
@@ -405,6 +407,24 @@ namespace ATP
                 }
             }
                        
+        }
+        /// <summary>
+        /// Метод добавления данных на график2
+        /// </summary>
+        /// <param name="date"></param>
+        /// <param name="p"></param>
+        public void AddToChart(System.Windows.Forms.DataVisualization.Charting.SeriesCollection ser, DateTime date, double p)
+        {
+            ser.Last().Points.AddXY(date, p);
+        }
+        /// <summary>
+        /// Метод изменения текста
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="st"></param>
+        public void ChangeTextMehtod(Label label, string st)
+        {
+            label.Text = st;
         }
       
     }
