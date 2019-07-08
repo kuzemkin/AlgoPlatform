@@ -356,17 +356,15 @@ namespace ATP
                         t.Last().ClosePrice = b[i].Open;
                         t.Last().CloseDate = b[i].Date;
                         t.Last().Result = t.Last().ClosePrice - t.Last().OpenPrice;
-                        t.Last().State = Collections.Trade.OrderState.Close;
-                        //Используем делегат, чтоб получит доступ к потоку
-                        changText?.Invoke(label12, t.Where(n => n.Result > 0).Select(m => m).Count().ToString());
-                        changText?.Invoke(label14, t.Where(n => n.Result < 0).Select(m => m).Count().ToString());
-                        changText?.Invoke(label16, Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum()).ToString());
+                        t.Last().State = Collections.Trade.OrderState.Close;    
                         if (InvokeRequired)
                         {
                             BeginInvoke(new MethodInvoker(delegate
-                            {                                
-                                
-                                if (b.Count > i)
+                            {
+                                changText?.Invoke(label12, t.Where(n => n.Result > 0).Select(m => m).Count().ToString());
+                                changText?.Invoke(label14, t.Where(n => n.Result < 0).Select(m => m).Count().ToString());
+                                changText?.Invoke(label16, Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum()).ToString());
+                                if (b.Count>i+1)
                                 {
                                     chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);
                                     chart1.Series[2].Points.AddXY(b[i].Date, b[i].Open);                                    
@@ -393,7 +391,7 @@ namespace ATP
                                 BeginInvoke(new MethodInvoker(delegate
                                 {
                                     label10.Text = t.Count().ToString();
-                                    if (b.Count > i)
+                                    if (b.Count>i+1)
                                     {                                        
                                         chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);
                                         chart1.Series[2].Points.AddXY(b[i].Date, b[i].Open);
