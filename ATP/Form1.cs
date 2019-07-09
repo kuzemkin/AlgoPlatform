@@ -240,7 +240,7 @@ namespace ATP
             }
         }
         /// <summary>
-        /// Метод получает рыночные данные по инструменту
+        /// Метод очищает график от колекций
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -263,7 +263,7 @@ namespace ATP
             }
         }
         /// <summary>
-        /// Метод получает данные с рынка
+        /// Метод получает рыночные данные по инструменту
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
