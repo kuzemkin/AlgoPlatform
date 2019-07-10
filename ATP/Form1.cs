@@ -28,7 +28,8 @@ namespace ATP
         public List<Collections.Portfolio> PortfList = new List<Collections.Portfolio>();
         public List<Collections.Trade> TradesList = new List<Collections.Trade>();
         public int n = 100;            //количество запрашиваемых баров 
-        public int ind = 15;             //индекс         
+        public int ind = 15;             //индекс  
+        public int sma = 50;
         /// <summary>
         /// Инициалезация компонентов
         /// </summary>
@@ -346,8 +347,8 @@ namespace ATP
             {
                 Invoke(new MethodInvoker(delegate
                 {                    
-                    chart1.Series[0].Points.AddXY(date, high, low, open, close);
-                    if(BarsList.Count>0)
+                    chart1.Series[0].Points.AddXY(date, high, low, open, close);                  
+                    if (BarsList.Count>0)
                     {                        
                        chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])-(Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[0])- chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])));
                     }                 
@@ -394,7 +395,7 @@ namespace ATP
                 {
                     for (int l = ind - 15, i = ind + 1; i < b.Count(); i++, l++)
                     {
-                        if (b[i].Close > b.GetRange(l, 15).Select(p => p.High).Max())
+                        if (b[i].Close > b.GetRange(l, 15).Select(p => p.High).Max() & b[i].Close>SMA(b,sma))
                         {
                             t.Add(new Collections.Trade(b[i].Date, b[i].Open, Collections.Trade.OrderType.Buy));                           
                             if (InvokeRequired)
@@ -402,11 +403,12 @@ namespace ATP
                                 Invoke(new MethodInvoker(delegate
                                 {
                                     label10.Text = t.Count().ToString();
-                                    chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);                                   
+                                    chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);                                 
                                     chart1.Series.Add(b[i].Date.ToString());
                                     chart1.Series.Last().ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
                                     chart1.Series.Last().Color= System.Drawing.Color.Blue;
                                     chart1.Series.Last().Points.AddXY(b[i].Date, b[i].Open);
+
 
                                 }));
                             }
@@ -414,9 +416,15 @@ namespace ATP
                         }
                     }
                 }
+            }                       
+        }
+        private double SMA(List<Collections.Bar> b, int n)
+        {
+            if (b.Count() > n)
+            {                
+                return ((b.GetRange(b.Count() - n, n).Select(p => p.Close).Sum()) / n);
             }
-                       
-        }     
-      
+            else return b.Select(t=>t.Close).Max();
+        }
     }
 }
