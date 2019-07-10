@@ -380,7 +380,7 @@ namespace ATP
                                 label14.Text=t.Where(n => n.Result < 0).Select(m => m).Count().ToString();
                                 label16.Text=Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum()).ToString();
                                 chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);                                
-                                chart1.Series.Last().Points.AddXY(b[i].Date, b[i].Open);
+                                chart1.Series.Last().Points.AddXY(b[i].Date, b[i].Open);                                
                                 chart2.Series[0].Points.AddXY(t.Last().CloseDate, t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(r => r.Result).Sum());
                             }));
                         }                        
@@ -414,9 +414,7 @@ namespace ATP
                         }
                     }
                 }
-            }
-                       
-        }     
-      
+            }                       
+        }       
     }
 }
