@@ -247,12 +247,9 @@ namespace ATP
         /// <param name="e"></param>
         public void ClearSeriesMethod(System.Windows.Forms.DataVisualization.Charting.Chart chart)
         {
-            if(chart.Series.Count>3)
+            for (int i = 3; chart.Series.Count > i; )
             {
-                for (int i = chart.Series.Count - 1; i == 1; i--)
-                {
-                    chart.Series.RemoveAt(i);
-                }
+                chart.Series.RemoveAt(i);
             }
         }
         /// <summary>
@@ -277,10 +274,10 @@ namespace ATP
             SmartCom.AddBar -= AddBars;
             BarsList.Clear();
             TradesList.Clear();
+            ClearSeriesMethod(chart1);
             ClearMethod(chart1.Series);
             ClearMethod(chart2.Series);           
-            ClearSeriesMethod(chart1);            
-
+            
             try
             {
                 SmartCom.GetBars(symbol, interval, new DateTime(SetDateTime(interval,n).Year, SetDateTime(interval, n).Month, SetDateTime(interval, n).Day, SetDateTime(interval, n).Hour, SetDateTime(interval, n).Minute, SetDateTime(interval, n).Second), - n);
