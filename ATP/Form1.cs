@@ -372,12 +372,12 @@ namespace ATP
         {            
             if (t.Count>0 && t.Last().State==Collections.Trade.OrderState.Active)
             {
-                for (int l=ind-15, i = ind+1; i < b.Count(); i++, l++)
+                for (int l=ind-15, i = ind+1; i+1 < b.Count(); i++, l++)
                 {
                     if (b[i].Close < b.GetRange(l, 15).Select(p => p.Low).Min())
                     {
-                        t.Last().ClosePrice = b[i].Close;
-                        t.Last().CloseDate = b[i].Date;
+                        t.Last().ClosePrice = b[i+1].Open;
+                        t.Last().CloseDate = b[i+1].Date;
                         t.Last().Result = t.Last().ClosePrice - t.Last().OpenPrice;
                         t.Last().State = Collections.Trade.OrderState.Close;    
                         if (InvokeRequired)
@@ -387,8 +387,8 @@ namespace ATP
                                 label12.Text=t.Where(n => n.Result > 0).Select(m => m).Count().ToString();
                                 label14.Text=t.Where(n => n.Result < 0).Select(m => m).Count().ToString();
                                 label16.Text=Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum()).ToString();
-                                chart1.Series[1].Points.AddXY(b[i].Date, b[i].Close);                                
-                                chart1.Series.Last().Points.AddXY(b[i].Date, b[i].Close);
+                                chart1.Series[1].Points.AddXY(b[i+1].Date, b[i+1].Open);                                
+                                chart1.Series.Last().Points.AddXY(b[i+1].Date, b[i+1].Open);
                                 chart2.Series[0].Points.AddXY(t.Last().CloseDate, t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(r => r.Result).Sum());
                             }));
                         }                        
@@ -400,23 +400,23 @@ namespace ATP
             {
                 if(b.Count>sma)
                 {
-                    for (int l = ind - 15, i = ind + 1; i < b.Count(); i++, l++)
+                    for (int l = ind - 15, i = ind + 1; i +1 < b.Count(); i++, l++)
                     {
                         if(i>sma)
                         {
                             if (b[i].Close > b.GetRange(l, 15).Select(p => p.High).Max() && b[i].Close > SMA(b.GetRange(i-sma, sma), sma))
                             {
-                                t.Add(new Collections.Trade(b[i].Date, b[i].Close, Collections.Trade.OrderType.Buy));
+                                t.Add(new Collections.Trade(b[i+1].Date, b[i+1].Open, Collections.Trade.OrderType.Buy));
                                 if (InvokeRequired)
                                 {
                                     Invoke(new MethodInvoker(delegate
                                     {
                                         label10.Text = t.Count().ToString();
-                                        chart1.Series[1].Points.AddXY(b[i].Date, b[i].Close);
+                                        chart1.Series[1].Points.AddXY(b[i+1].Date, b[i+1].Open);
                                         chart1.Series.Add(b[i].Date.ToString());
                                         chart1.Series.Last().ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
                                         chart1.Series.Last().Color = System.Drawing.Color.Blue;
-                                        chart1.Series.Last().Points.AddXY(b[i].Date, b[i].Close);
+                                        chart1.Series.Last().Points.AddXY(b[i+1].Date, b[i+1].Open);
                                     }));
                                 }
                                 ind = b.FindLastIndex(p => p.Date == t.Last().OpenDate);
