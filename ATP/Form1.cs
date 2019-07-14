@@ -28,7 +28,8 @@ namespace ATP
         public List<Collections.Portfolio> PortfList = new List<Collections.Portfolio>();
         public List<Collections.Trade> TradesList = new List<Collections.Trade>();
         public int n = 100;            //количество запрашиваемых баров 
-        public int ind = 15;             //индекс         
+        public int ind = 15;             //индекс  
+        public int sma = 100;
         /// <summary>
         /// Инициалезация компонентов
         /// </summary>
@@ -85,8 +86,7 @@ namespace ATP
                 {
                     label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
                 }                
-            }
-                   
+            }        
         }
         /// <summary>
         /// Метод отображает статус соединения с сервером
@@ -107,10 +107,8 @@ namespace ATP
                     {
                         label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
                     }
-                   
                 }));
-            }          
-                       
+            }                   
         }
         /// <summary>
         /// Метод отображает статус соединения с сервером
@@ -145,7 +143,6 @@ namespace ATP
                     label8.Text = saldo.ToString("# ###.#") + "  руб.";
                 }));
             }
-            
         }
         /// <summary>
         /// Метод очистки поля ввода инструмента
@@ -240,15 +237,15 @@ namespace ATP
             }
         }
         /// <summary>
-        /// Метод очищает график от колекций
+        /// Метод получает рыночные данные по инструменту
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void ClearSeriesMethdo(System.Windows.Forms.DataVisualization.Charting.Chart chart)
+        public void ClearSeriesMethod(System.Windows.Forms.DataVisualization.Charting.Chart chart)
         {
-            for (int i = chart.Series.Count() - 1; i >= 2; i--)
+            for (int i = 3; chart.Series.Count > i; )
             {
-                chart.Series.RemoveAt(i);               
+                chart.Series.RemoveAt(i);
             }
         }
         /// <summary>
@@ -263,20 +260,21 @@ namespace ATP
             }
         }
         /// <summary>
-        /// Метод получает рыночные данные по инструменту
+        /// Метод получает данные с рынка
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void button2_Click(object sender, EventArgs e)
         {
+            //сбрасываем коллекции к начальному значению
             ind = 15;
             SmartCom.AddBar -= AddBars;
             BarsList.Clear();
             TradesList.Clear();
+            ClearSeriesMethod(chart1);
             ClearMethod(chart1.Series);
             ClearMethod(chart2.Series);           
-            ClearSeriesMethdo(chart1);            
-
+            //получаем бары
             try
             {
                 SmartCom.GetBars(symbol, interval, new DateTime(SetDateTime(interval,n).Year, SetDateTime(interval, n).Month, SetDateTime(interval, n).Day, SetDateTime(interval, n).Hour, SetDateTime(interval, n).Minute, SetDateTime(interval, n).Second), - n);
@@ -284,6 +282,12 @@ namespace ATP
             }
             catch { label3.Text = $"[{DateTime.Now}]: Возникла ошибка!"; }
         }
+        /// <summary>
+        /// Метод установки даты отсчета
+        /// </summary>
+        /// <param name="interval"></param>
+        /// <param name="n"></param>
+        /// <returns></returns>
         public static DateTime SetDateTime(StBarInterval interval, int n)
         {
             DateTime setdate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, 0);
@@ -346,12 +350,15 @@ namespace ATP
             {
                 Invoke(new MethodInvoker(delegate
                 {                    
-                    chart1.Series[0].Points.AddXY(date, high, low, open, close);
-                    if(BarsList.Count>0)
+                    chart1.Series[0].Points.AddXY(date, high, low, open, close);                    
+                    if (BarsList.Count>0)
                     {                        
                        chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])-(Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[0])- chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])));
-                    }                 
-                                       
+                    }    
+                    if(BarsList.Count>sma)
+                    {
+                        chart1.Series[2].Points.AddXY(BarsList.Last().Date, ((BarsList.GetRange(BarsList.Count() - sma, sma).Select(p => p.Close).Sum()) / sma));
+                    }                   
             }));
             }
             Strategy1(BarsList, TradesList);
@@ -361,15 +368,17 @@ namespace ATP
         /// </summary>
         /// <param name="b"></param>
         public void Strategy1(List<Collections.Bar> b, List<Collections.Trade> t)
-        {            
-            if (t.Count()>0 && t.Last().State==Collections.Trade.OrderState.Active)
+        {    
+            //проверяем есть ли открытые позиции
+            if (t.Count>0 && t.Last().State==Collections.Trade.OrderState.Active)
             {
-                for (int l=ind-15, i = ind+1; i < b.Count(); i++, l++)
+                //условия выхода
+                for (int l=ind-15, i = ind+1; i+1 < b.Count(); i++, l++)
                 {
                     if (b[i].Close < b.GetRange(l, 15).Select(p => p.Low).Min())
                     {
-                        t.Last().ClosePrice = b[i].Open;
-                        t.Last().CloseDate = b[i].Date;
+                        t.Last().ClosePrice = b[i+1].Open;
+                        t.Last().CloseDate = b[i+1].Date;
                         t.Last().Result = t.Last().ClosePrice - t.Last().OpenPrice;
                         t.Last().State = Collections.Trade.OrderState.Close;    
                         if (InvokeRequired)
@@ -378,9 +387,9 @@ namespace ATP
                             {
                                 label12.Text=t.Where(n => n.Result > 0).Select(m => m).Count().ToString();
                                 label14.Text=t.Where(n => n.Result < 0).Select(m => m).Count().ToString();
-                                label16.Text=Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum()).ToString();
-                                chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);                                
-                                chart1.Series.Last().Points.AddXY(b[i].Date, b[i].Open);                                
+                                label16.Text=Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum(),1).ToString();
+                                chart1.Series[1].Points.AddXY(b[i+1].Date, b[i+1].Open);                                
+                                chart1.Series.Last().Points.AddXY(b[i+1].Date, b[i+1].Open);
                                 chart2.Series[0].Points.AddXY(t.Last().CloseDate, t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(r => r.Result).Sum());
                             }));
                         }                        
@@ -390,31 +399,44 @@ namespace ATP
             }
             else
             {
-                if(b.Count()>15)
+                if(b.Count>sma)
                 {
-                    for (int l = ind - 15, i = ind + 1; i < b.Count(); i++, l++)
+                    //условия входа
+                    for (int l = ind - 15, i = ind + 1; i +1 < b.Count(); i++, l++)
                     {
-                        if (b[i].Close > b.GetRange(l, 15).Select(p => p.High).Max())
+                        if(i>sma)
                         {
-                            t.Add(new Collections.Trade(b[i].Date, b[i].Open, Collections.Trade.OrderType.Buy));                           
-                            if (InvokeRequired)
+                            if (b[i].Close > b.GetRange(l, 15).Select(p => p.High).Max() && b[i].Close > SMA(b.GetRange(i-sma, sma), sma))
                             {
-                                Invoke(new MethodInvoker(delegate
+                                t.Add(new Collections.Trade(b[i+1].Date, b[i+1].Open, Collections.Trade.OrderType.Buy));
+                                if (InvokeRequired)
                                 {
-                                    label10.Text = t.Count().ToString();
-                                    chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);                                   
-                                    chart1.Series.Add(b[i].Date.ToString());
-                                    chart1.Series.Last().ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-                                    chart1.Series.Last().Color= System.Drawing.Color.Blue;
-                                    chart1.Series.Last().Points.AddXY(b[i].Date, b[i].Open);
-
-                                }));
+                                    Invoke(new MethodInvoker(delegate
+                                    {
+                                        label10.Text = t.Count().ToString();
+                                        chart1.Series[1].Points.AddXY(b[i+1].Date, b[i+1].Open);
+                                        chart1.Series.Add(b[i].Date.ToString());
+                                        chart1.Series.Last().ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+                                        chart1.Series.Last().Color = System.Drawing.Color.Blue;
+                                        chart1.Series.Last().Points.AddXY(b[i+1].Date, b[i+1].Open);
+                                    }));
+                                }
+                                ind = b.FindLastIndex(p => p.Date == t.Last().OpenDate);
                             }
-                            ind = b.FindLastIndex(p => p.Date == t.Last().OpenDate);
                         }
                     }
                 }
             }                       
-        }       
+        }
+        /// <summary>
+        /// Метод вычисляет SMA
+        /// </summary>
+        /// <param name="bar"></param>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        private double SMA(List<Collections.Bar> bar, int n)
+        {           
+            return ((bar.GetRange(bar.Count - n, n).Select(p => p.Close).Sum()) / n);
+        }
     }
 }
