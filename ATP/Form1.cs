@@ -27,9 +27,10 @@ namespace ATP
         public List<Collections.Bar> BarsList= new List<Collections.Bar>();
         public List<Collections.Portfolio> PortfList = new List<Collections.Portfolio>();
         public List<Collections.Trade> TradesList = new List<Collections.Trade>();
-        public int n = 100;            //количество запрашиваемых баров 
-        public int ind = 15;             //индекс  
-        public int sma = 100;
+        public int n = 100;                  //количество запрашиваемых баров 
+        public static int nBars = 15;        //количество баров для отрезка экстремумов
+        public int ind = nBars;              //начальный индекс  
+        public int sma = 100;                //количество баров для скользящей средней       
         /// <summary>
         /// Инициалезация компонентов
         /// </summary>
@@ -267,7 +268,7 @@ namespace ATP
         private void button2_Click(object sender, EventArgs e)
         {
             //сбрасываем коллекции к начальному значению
-            ind = 15;
+            ind = nBars;
             SmartCom.AddBar -= AddBars;
             BarsList.Clear();
             TradesList.Clear();
@@ -373,9 +374,9 @@ namespace ATP
             if (t.Count>0 && t.Last().State==Collections.Trade.OrderState.Active)
             {
                 //условия выхода
-                for (int l=ind-15, i = ind+1; i+1 < b.Count(); i++, l++)
+                for (int l=ind-nBars, i = ind+1; i+1 < b.Count(); i++, l++)
                 {
-                    if (b[i].Close < b.GetRange(l, 15).Select(p => p.Low).Min())
+                    if (b[i].Close < b.GetRange(l, nBars).Select(p => p.Low).Min())
                     {
                         t.Last().ClosePrice = b[i+1].Open;
                         t.Last().CloseDate = b[i+1].Date;
@@ -402,14 +403,14 @@ namespace ATP
                 if(b.Count>sma)
                 {
                     //условия входа
-                    for (int l = ind - 15, i = ind + 1; i +1 < b.Count(); i++, l++)
+                    for (int l = ind - nBars, i = ind + 1; i +1 < b.Count(); i++, l++)
                     {
                         if(i>sma)
                         {
-                            if (b[i].Close > b.GetRange(l, 15).Select(p => p.High).Max() && b[i].Close > SMA(b.GetRange(i-sma, sma), sma))
+                            if (b[i].Close > b.GetRange(l, nBars).Select(p => p.High).Max() && b[i].Close > SMA(b.GetRange(i-sma, sma), sma))
                             {
                                 t.Add(new Collections.Trade(b[i+1].Date, b[i+1].Open, Collections.Trade.OrderType.Buy));
-                                if (InvokeRequired)
+                                if (InvokeRequired) 
                                 {
                                     Invoke(new MethodInvoker(delegate
                                     {
