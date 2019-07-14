@@ -86,8 +86,7 @@ namespace ATP
                 {
                     label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
                 }                
-            }
-                   
+            }        
         }
         /// <summary>
         /// Метод отображает статус соединения с сервером
@@ -108,10 +107,8 @@ namespace ATP
                     {
                         label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
                     }
-                   
                 }));
-            }          
-                       
+            }                   
         }
         /// <summary>
         /// Метод отображает статус соединения с сервером
@@ -146,7 +143,6 @@ namespace ATP
                     label8.Text = saldo.ToString("# ###.#") + "  руб.";
                 }));
             }
-            
         }
         /// <summary>
         /// Метод очистки поля ввода инструмента
@@ -270,6 +266,7 @@ namespace ATP
         /// <param name="e"></param>
         private void button2_Click(object sender, EventArgs e)
         {
+            //сбрасываем коллекции к начальному значению
             ind = 15;
             SmartCom.AddBar -= AddBars;
             BarsList.Clear();
@@ -277,7 +274,7 @@ namespace ATP
             ClearSeriesMethod(chart1);
             ClearMethod(chart1.Series);
             ClearMethod(chart2.Series);           
-            
+            //получаем бары
             try
             {
                 SmartCom.GetBars(symbol, interval, new DateTime(SetDateTime(interval,n).Year, SetDateTime(interval, n).Month, SetDateTime(interval, n).Day, SetDateTime(interval, n).Hour, SetDateTime(interval, n).Minute, SetDateTime(interval, n).Second), - n);
@@ -285,6 +282,12 @@ namespace ATP
             }
             catch { label3.Text = $"[{DateTime.Now}]: Возникла ошибка!"; }
         }
+        /// <summary>
+        /// Метод установки даты отсчета
+        /// </summary>
+        /// <param name="interval"></param>
+        /// <param name="n"></param>
+        /// <returns></returns>
         public static DateTime SetDateTime(StBarInterval interval, int n)
         {
             DateTime setdate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, 0);
@@ -355,8 +358,7 @@ namespace ATP
                     if(BarsList.Count>sma)
                     {
                         chart1.Series[2].Points.AddXY(BarsList.Last().Date, ((BarsList.GetRange(BarsList.Count() - sma, sma).Select(p => p.Close).Sum()) / sma));
-                    }
-                                       
+                    }                   
             }));
             }
             Strategy1(BarsList, TradesList);
@@ -366,9 +368,11 @@ namespace ATP
         /// </summary>
         /// <param name="b"></param>
         public void Strategy1(List<Collections.Bar> b, List<Collections.Trade> t)
-        {            
+        {    
+            //проверяем есть ли открытые позиции
             if (t.Count>0 && t.Last().State==Collections.Trade.OrderState.Active)
             {
+                //условия выхода
                 for (int l=ind-15, i = ind+1; i+1 < b.Count(); i++, l++)
                 {
                     if (b[i].Close < b.GetRange(l, 15).Select(p => p.Low).Min())
@@ -383,7 +387,7 @@ namespace ATP
                             {
                                 label12.Text=t.Where(n => n.Result > 0).Select(m => m).Count().ToString();
                                 label14.Text=t.Where(n => n.Result < 0).Select(m => m).Count().ToString();
-                                label16.Text=Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum()).ToString();
+                                label16.Text=Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum(),1).ToString();
                                 chart1.Series[1].Points.AddXY(b[i+1].Date, b[i+1].Open);                                
                                 chart1.Series.Last().Points.AddXY(b[i+1].Date, b[i+1].Open);
                                 chart2.Series[0].Points.AddXY(t.Last().CloseDate, t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(r => r.Result).Sum());
@@ -397,6 +401,7 @@ namespace ATP
             {
                 if(b.Count>sma)
                 {
+                    //условия входа
                     for (int l = ind - 15, i = ind + 1; i +1 < b.Count(); i++, l++)
                     {
                         if(i>sma)
@@ -423,6 +428,12 @@ namespace ATP
                 }
             }                       
         }
+        /// <summary>
+        /// Метод вычисляет SMA
+        /// </summary>
+        /// <param name="bar"></param>
+        /// <param name="n"></param>
+        /// <returns></returns>
         private double SMA(List<Collections.Bar> bar, int n)
         {           
             return ((bar.GetRange(bar.Count - n, n).Select(p => p.Close).Sum()) / n);
