@@ -375,7 +375,7 @@ namespace ATP
         /// </summary>
         /// <param name="b"></param>
         public void Strategy1(List<Collections.Bar> b, List<Collections.Trade> t)
-        {    
+        {            
             //проверяем есть ли открытые позиции
             if (t.Count>0 && t.Last().State==Collections.Trade.OrderState.Active)
             {
@@ -392,13 +392,14 @@ namespace ATP
                         {
                             Invoke(new MethodInvoker(delegate
                             {
-                                label12.Text=t.Where(n => n.Result > 0).Select(m => m).Count().ToString();
-                                label14.Text=t.Where(n => n.Result < 0).Select(m => m).Count().ToString();
-                                label16.Text=Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum(),1).ToString();
-                                label19.Text = Math.Round((t.Where(r => r.Result > 0).Select(s => s.Result).Sum())/Math.Abs(t.Where(r => r.Result < 0).Select(s => s.Result).Sum()),2).ToString();
-                                chart1.Series[1].Points.AddXY(b[i+1].Date, b[i+1].Open);                                
-                                chart1.Series.Last().Points.AddXY(b[i+1].Date, b[i+1].Open);
-                                chart2.Series[0].Points.AddXY(t.Last().CloseDate, t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(r => r.Result).Sum());
+                            label12.Text = t.Where(n => n.Result > 0).Select(m => m).Count().ToString();
+                            label14.Text = t.Where(n => n.Result < 0).Select(m => m).Count().ToString();
+                            label16.Text = Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum(), 1).ToString();
+                            label19.Text = Math.Round((t.Where(r => r.Result > 0).Select(s => s.Result).Sum()) / Math.Abs(t.Where(r => r.Result < 0).Select(s => s.Result).Sum()), 2).ToString();
+                            label21.Text = Math.Round((b.Last().Close - b[0].Open), 2).ToString();
+                            chart1.Series[1].Points.AddXY(b[i + 1].Date, b[i + 1].Open);
+                            chart1.Series.Last().Points.AddXY(b[i + 1].Date, b[i + 1].Open);
+                            chart2.Series[0].Points.AddXY(t.Last().CloseDate, t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(r => r.Result).Sum());                            
                             }));
                         }                        
                         ind = b.FindLastIndex(p => p.Date == t.Last().CloseDate);                         
