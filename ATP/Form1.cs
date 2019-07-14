@@ -172,6 +172,11 @@ namespace ATP
         {
             textBox4.Text = "";
         }
+        /// <summary>
+        /// Метод считывает количество запрашиваемых баров с поля ввода
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TextBox4LostFocus(object sender, EventArgs e)
         {
             int.TryParse(textBox4.Text, out n);
