@@ -59,6 +59,8 @@
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.chart2 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label19 = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
@@ -368,7 +370,8 @@
             this.chart2.Location = new System.Drawing.Point(383, 19);
             this.chart2.Name = "chart2";
             series4.ChartArea = "ChartArea1";
-            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.SplineArea;
+            series4.Color = System.Drawing.Color.Blue;
             series4.Name = "Series1";
             series4.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
             series4.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
@@ -379,6 +382,8 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.label19);
+            this.groupBox3.Controls.Add(this.label18);
             this.groupBox3.Controls.Add(this.label16);
             this.groupBox3.Controls.Add(this.label15);
             this.groupBox3.Controls.Add(this.label14);
@@ -393,6 +398,24 @@
             this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Статистика";
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(286, 150);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(36, 17);
+            this.label19.TabIndex = 9;
+            this.label19.Text = ".......";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(10, 150);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(117, 17);
+            this.label18.TabIndex = 8;
+            this.label18.Text = "Профит фактор:";
             // 
             // label16
             // 
@@ -532,6 +555,8 @@
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.DataVisualization.Charting.Chart chart2;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Label label19;
     }
 }
 

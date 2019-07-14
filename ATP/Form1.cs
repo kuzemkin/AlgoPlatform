@@ -352,7 +352,7 @@ namespace ATP
                 Invoke(new MethodInvoker(delegate
                 {                    
                     chart1.Series[0].Points.AddXY(date, high, low, open, close);                    
-                    if (BarsList.Count>0)
+                    if (BarsList.Count>nBars)
                     {                        
                        chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])-(Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[0])- chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])));
                     }    
@@ -389,6 +389,7 @@ namespace ATP
                                 label12.Text=t.Where(n => n.Result > 0).Select(m => m).Count().ToString();
                                 label14.Text=t.Where(n => n.Result < 0).Select(m => m).Count().ToString();
                                 label16.Text=Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum(),1).ToString();
+                                label19.Text = Math.Round((t.Where(r => r.Result > 0).Select(s => s.Result).Sum())/Math.Abs(t.Where(r => r.Result < 0).Select(s => s.Result).Sum()),2).ToString();
                                 chart1.Series[1].Points.AddXY(b[i+1].Date, b[i+1].Open);                                
                                 chart1.Series.Last().Points.AddXY(b[i+1].Date, b[i+1].Open);
                                 chart2.Series[0].Points.AddXY(t.Last().CloseDate, t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(r => r.Result).Sum());
