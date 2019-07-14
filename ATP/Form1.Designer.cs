@@ -371,7 +371,7 @@
             this.chart2.Name = "chart2";
             series4.ChartArea = "ChartArea1";
             series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.SplineArea;
-            series4.Color = System.Drawing.Color.Blue;
+            series4.Color = System.Drawing.Color.MidnightBlue;
             series4.Name = "Series1";
             series4.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
             series4.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;

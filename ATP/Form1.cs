@@ -274,7 +274,8 @@ namespace ATP
             TradesList.Clear();
             ClearSeriesMethod(chart1);
             ClearMethod(chart1.Series);
-            ClearMethod(chart2.Series);           
+            ClearMethod(chart2.Series);
+            chart1.ChartAreas[0].AxisY.Minimum = 0;
             //получаем бары
             try
             {
