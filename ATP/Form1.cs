@@ -375,7 +375,12 @@ namespace ATP
         /// </summary>
         /// <param name="b"></param>
         public void Strategy1(List<Collections.Bar> b, List<Collections.Trade> t)
-        {            
+        { 
+            if(b.Count==sma)
+            {
+                nBars = (int)Math.Round(((b.GetRange(0, sma - 1).Max(p=>p.High) - (b.GetRange(0, sma - 1).Min(p=>p.Low)))/ ((b.GetRange(0, sma - 1).Select(p => p.High).Sum() - (b.GetRange(0, sma - 1).Select(p => p.Low).Sum())) / b.Count())));
+                ind = nBars;
+            }
             //проверяем есть ли открытые позиции
             if (t.Count>0 && t.Last().State==Collections.Trade.OrderState.Active)
             {
@@ -409,11 +414,11 @@ namespace ATP
             else
             {
                 if(b.Count>sma)
-                {
+                {                   
                     //условия входа
                     for (int l = ind - nBars, i = ind + 1; i +1 < b.Count(); i++, l++)
-                    {
-                        if(i>sma)
+                    {                       
+                        if (i>sma)
                         {
                             if (b[i].Close > b.GetRange(l, nBars).Select(p => p.High).Max() && b[i].Close > SMA(b.GetRange(i-sma, sma), sma))
                             {
@@ -430,8 +435,9 @@ namespace ATP
                                         chart1.Series.Last().Points.AddXY(b[i+1].Date, b[i+1].Open);
                                     }));
                                 }
-                                ind = b.FindLastIndex(p => p.Date == t.Last().OpenDate);
+                                ind = b.FindLastIndex(p => p.Date == t.Last().OpenDate);                                
                             }
+                            //nBars = (int)Math.Round((b.GetRange(b.Count - sma, sma - 1).Select(p => p.High).Sum() - (b.GetRange(b.Count - sma, sma - 1).Select(p => p.Low).Sum())));
                         }
                     }
                 }
