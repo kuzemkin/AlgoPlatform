@@ -409,8 +409,7 @@ namespace ATP
             else
             {
                 if(b.Count>sma)
-                {
-                    nBars = (int) Math.Round(((b.Select(p => p.High).Sum()) - (b.Select(n => n.Low).Sum()))/b.Count()/10);                    
+                {                                     
                     //условия входа
                     for (int l = ind - nBars, i = ind + 1; i +1 < b.Count(); i++, l++)
                     {
