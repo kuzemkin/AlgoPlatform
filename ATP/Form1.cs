@@ -378,7 +378,7 @@ namespace ATP
         { 
             if(b.Count==sma)
             {
-                nBars = (int)Math.Round(((b.GetRange(0, sma - 1).Max(p=>p.High) - (b.GetRange(0, sma - 1).Min(p=>p.Low)))/ ((b.GetRange(0, sma - 1).Select(p => p.High).Sum() - (b.GetRange(0, sma - 1).Select(p => p.Low).Sum())) / b.Count())));
+                nBars = (int)Math.Round(((((b.GetRange(0, sma - 1).Select(p => p.High).Sum() - (b.GetRange(0, sma - 1).Select(p => p.Low).Sum())) / sma)) / ((b.GetRange(0, sma/2 - 1).Select(p => p.High).Sum() - (b.GetRange(0, sma/2-1).Select(p => p.Low).Sum())) / sma/2))*10);
                 ind = nBars;
             }
             //проверяем есть ли открытые позиции
@@ -418,11 +418,11 @@ namespace ATP
                     //условия входа
                     for (int l = ind - nBars, i = ind + 1; i +1 < b.Count(); i++, l++)
                     {                       
-                        if (i>sma)
+                        if (i>sma & l+nBars<b.Count())
                         {
                             if (b[i].Close > b.GetRange(l, nBars).Select(p => p.High).Max() && b[i].Close > SMA(b.GetRange(i-sma, sma), sma))
                             {
-                                t.Add(new Collections.Trade(b[i+1].Date, b[i+1].Open, Collections.Trade.OrderType.Buy));
+                                t.Add(new Collections.Trade(b[i+1].Date, b[i+1].Open, Collections.Trade.OrderType.Buy)); MessageBox.Show(nBars.ToString());
                                 if (InvokeRequired) 
                                 {
                                     Invoke(new MethodInvoker(delegate
@@ -437,6 +437,7 @@ namespace ATP
                                 }
                                 ind = b.FindLastIndex(p => p.Date == t.Last().OpenDate);                                
                             }
+                            nBars = (int)Math.Round(((((b.GetRange(i - sma - 1, sma).Select(p => p.High).Sum() - (b.GetRange(i - sma - 1, sma).Select(p => p.Low).Sum())) / sma)) / ((b.GetRange(i-(sma/2)-1, sma/2).Select(p => p.High).Sum() - (b.GetRange(i-(sma/2)-1, sma/2).Select(p => p.Low).Sum())) / sma/2))*10); 
                             //nBars = (int)Math.Round((b.GetRange(b.Count - sma, sma - 1).Select(p => p.High).Sum() - (b.GetRange(b.Count - sma, sma - 1).Select(p => p.Low).Sum())));
                         }
                     }
