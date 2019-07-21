@@ -361,8 +361,13 @@ namespace ATP
                     if (BarsList.Count>nBars)
                     {                        
                        chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])-(Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[0])- chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])));
-                    }    
+                    }
                     //добавляем скользящую среднею на график
+                    if(BarsList.Count()>50)
+                    {
+                        //sma = (int)(BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - 51, 50).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - 51, 50).Select(m => m.Low).Sum())) / 50));                        
+                    }                   
+                    
                     if(BarsList.Count>sma)
                     {
                         chart1.Series[2].Points.AddXY(BarsList.Last().Date, ((BarsList.GetRange(BarsList.Count() - sma, sma).Select(p => p.Close).Sum()) / sma));
@@ -429,36 +434,33 @@ namespace ATP
                     }
                 }
             }
-            else
+            if (b.Count > sma)
             {
-                if(b.Count>sma)
+                //условия входа
+                for (int l = ind - nBars, i = ind + 1; i + 1 < b.Count(); i++, l++)
                 {
-                    //условия входа
-                    for (int l = ind - nBars, i = ind + 1; i +1 < b.Count(); i++, l++)
+                    if (i > sma)
                     {
-                        if(i>sma)
+                        if (b[i].Close > b.GetRange(l, nBars).Select(p => p.High).Max() && b[i].Close > SMA(b.GetRange(i - sma, sma), sma))
                         {
-                            if (b[i].Close > b.GetRange(l, nBars).Select(p => p.High).Max() && b[i].Close > SMA(b.GetRange(i-sma, sma), sma))
+                            t.Add(new Collections.Trade(b[i + 1].Date, b[i + 1].Open, Collections.Trade.OrderType.Buy));
+                            if (InvokeRequired)
                             {
-                                t.Add(new Collections.Trade(b[i+1].Date, b[i+1].Open, Collections.Trade.OrderType.Buy));
-                                if (InvokeRequired) 
+                                Invoke(new MethodInvoker(delegate
                                 {
-                                    Invoke(new MethodInvoker(delegate
-                                    {
-                                        label10.Text = t.Count().ToString();
-                                        chart1.Series[1].Points.AddXY(b[i+1].Date, b[i+1].Open);
-                                        chart1.Series.Add(b[i].Date.ToString());
-                                        chart1.Series.Last().ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-                                        chart1.Series.Last().Color = System.Drawing.Color.Blue;
-                                        chart1.Series.Last().Points.AddXY(b[i+1].Date, b[i+1].Open);
-                                    }));
-                                }
-                                ind = b.FindLastIndex(p => p.Date == t.Last().OpenDate); 
+                                    label10.Text = t.Count().ToString();
+                                    chart1.Series[1].Points.AddXY(b[i + 1].Date, b[i + 1].Open);
+                                    chart1.Series.Add(b[i].Date.ToString());
+                                    chart1.Series.Last().ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+                                    chart1.Series.Last().Color = System.Drawing.Color.Blue;
+                                    chart1.Series.Last().Points.AddXY(b[i + 1].Date, b[i + 1].Open);
+                                }));
                             }
+                            ind = b.FindLastIndex(p => p.Date == t.Last().OpenDate);
                         }
                     }
                 }
-            }                       
+            }
         }
         /// <summary>
         /// Метод вычисляет SMA
