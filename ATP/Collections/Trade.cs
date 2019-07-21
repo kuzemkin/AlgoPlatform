@@ -27,6 +27,7 @@ namespace ATP.Collections
         public OrderState State { get; set; }
         public double Amount { get; set; }
         public double Result { get; set; }        
+        public TimeSpan Span { get; set; }
               
         public Trade(DateTime date, double openPrice, OrderType order)
         {

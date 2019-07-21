@@ -362,6 +362,7 @@ namespace ATP
                     {                        
                        chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])-(Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[0])- chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])));
                     }    
+                    //добавляем скользящую среднею на график
                     if(BarsList.Count>sma)
                     {
                         chart1.Series[2].Points.AddXY(BarsList.Last().Date, ((BarsList.GetRange(BarsList.Count() - sma, sma).Select(p => p.Close).Sum()) / sma));
@@ -375,12 +376,7 @@ namespace ATP
         /// </summary>
         /// <param name="b"></param>
         public void Strategy1(List<Collections.Bar> b, List<Collections.Trade> t)
-        { 
-            if(b.Count==sma)
-            {
-                nBars = (int)Math.Round(((((b.GetRange(0, sma - 1).Select(p => p.High).Sum() - (b.GetRange(0, sma - 1).Select(p => p.Low).Sum())) / sma)) / ((b.GetRange(0, sma/2 - 1).Select(p => p.High).Sum() - (b.GetRange(0, sma/2-1).Select(p => p.Low).Sum())) / sma/2))*10);
-                ind = nBars;
-            }
+        {            
             //проверяем есть ли открытые позиции
             if (t.Count>0 && t.Last().State==Collections.Trade.OrderState.Active)
             {
@@ -392,7 +388,8 @@ namespace ATP
                         t.Last().ClosePrice = b[i+1].Open;
                         t.Last().CloseDate = b[i+1].Date;
                         t.Last().Result = t.Last().ClosePrice - t.Last().OpenPrice;
-                        t.Last().State = Collections.Trade.OrderState.Close;    
+                        t.Last().State = Collections.Trade.OrderState.Close;
+                        t.Last().Span = t.Last().CloseDate - t.Last().OpenDate;
                         if (InvokeRequired)
                         {
                             Invoke(new MethodInvoker(delegate
@@ -401,7 +398,28 @@ namespace ATP
                             label14.Text = t.Where(n => n.Result < 0).Select(m => m).Count().ToString();
                             label16.Text = Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum(), 1).ToString();
                             label19.Text = Math.Round((t.Where(r => r.Result > 0).Select(s => s.Result).Sum()) / Math.Abs(t.Where(r => r.Result < 0).Select(s => s.Result).Sum()), 2).ToString();
-                            label21.Text = Math.Round((b.Last().Close - b[0].Open), 2).ToString();
+                            label21.Text = Math.Round((b.Last().Close - b[0].Open), 2).ToString(); 
+                                switch(interval)
+                                {
+                                    case StBarInterval.StBarInterval_Day:
+                                        label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalDays) / t.Count())).ToString();
+                                        break;
+                                    case StBarInterval.StBarInterval_Week:
+                                        label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalDays) / t.Count())).ToString();
+                                        break;
+                                    case StBarInterval.StBarInterval_60Min:
+                                        label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalHours) / t.Count())).ToString();
+                                        break;
+                                    case StBarInterval.StBarInterval_2Hour:
+                                        label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalHours) / t.Count())).ToString();
+                                        break;
+                                    case StBarInterval.StBarInterval_4Hour:
+                                        label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalHours) / t.Count())).ToString();
+                                        break;
+                                    default:
+                                        label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalMinutes) / t.Count())).ToString();
+                                        break;
+                                }
                             chart1.Series[1].Points.AddXY(b[i + 1].Date, b[i + 1].Open);
                             chart1.Series.Last().Points.AddXY(b[i + 1].Date, b[i + 1].Open);
                             chart2.Series[0].Points.AddXY(t.Last().CloseDate, t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(r => r.Result).Sum());                            
@@ -414,15 +432,15 @@ namespace ATP
             else
             {
                 if(b.Count>sma)
-                {                   
+                {
                     //условия входа
                     for (int l = ind - nBars, i = ind + 1; i +1 < b.Count(); i++, l++)
-                    {                       
-                        if (i>sma & l+nBars<b.Count())
+                    {
+                        if(i>sma)
                         {
                             if (b[i].Close > b.GetRange(l, nBars).Select(p => p.High).Max() && b[i].Close > SMA(b.GetRange(i-sma, sma), sma))
                             {
-                                t.Add(new Collections.Trade(b[i+1].Date, b[i+1].Open, Collections.Trade.OrderType.Buy)); MessageBox.Show(nBars.ToString());
+                                t.Add(new Collections.Trade(b[i+1].Date, b[i+1].Open, Collections.Trade.OrderType.Buy));
                                 if (InvokeRequired) 
                                 {
                                     Invoke(new MethodInvoker(delegate
@@ -435,10 +453,8 @@ namespace ATP
                                         chart1.Series.Last().Points.AddXY(b[i+1].Date, b[i+1].Open);
                                     }));
                                 }
-                                ind = b.FindLastIndex(p => p.Date == t.Last().OpenDate);                                
+                                ind = b.FindLastIndex(p => p.Date == t.Last().OpenDate); 
                             }
-                            nBars = (int)Math.Round(((((b.GetRange(i - sma - 1, sma).Select(p => p.High).Sum() - (b.GetRange(i - sma - 1, sma).Select(p => p.Low).Sum())) / sma)) / ((b.GetRange(i-(sma/2)-1, sma/2).Select(p => p.High).Sum() - (b.GetRange(i-(sma/2)-1, sma/2).Select(p => p.Low).Sum())) / sma/2))*10); 
-                            //nBars = (int)Math.Round((b.GetRange(b.Count - sma, sma - 1).Select(p => p.High).Sum() - (b.GetRange(b.Count - sma, sma - 1).Select(p => p.Low).Sum())));
                         }
                     }
                 }
