@@ -28,7 +28,7 @@ namespace ATP
         public List<Collections.Portfolio> PortfList = new List<Collections.Portfolio>();
         public List<Collections.Trade> TradesList = new List<Collections.Trade>();
         public int n = 100;                  //количество запрашиваемых баров 
-        public static int nBars = 15;        //количество баров для отрезка экстремумов
+        public static int nBars = 30;        //количество баров для отрезка экстремумов
         public int ind = nBars;              //начальный индекс  
         public int sma;                //количество баров для скользящей средней       
         /// <summary>
@@ -365,13 +365,41 @@ namespace ATP
                     //добавляем скользящую среднею на график
                     if (BarsList.Count() > nBars)
                     {
-                        sma = (int)(BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars));
+                        switch (interval)
+                        {
+                            case StBarInterval.StBarInterval_1Min:
+                                sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/50);
+                                break;
+                            case StBarInterval.StBarInterval_5Min:
+                                sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/30);
+                                break;
+                            case StBarInterval.StBarInterval_10Min:
+                                sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/20);
+                                break;
+                            case StBarInterval.StBarInterval_15Min:
+                                sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/12);
+                                break;
+                            case StBarInterval.StBarInterval_30Min:
+                                sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/5);
+                                break;
+                            case StBarInterval.StBarInterval_60Min:
+                                sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/3);
+                                break;
+                            case StBarInterval.StBarInterval_2Hour:
+                                sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/1.5);
+                                break;
+                            case StBarInterval.StBarInterval_4Hour:
+                                sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars)));
+                                break;
+                            default:
+                                sma = (int)(BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars));
+                                break;
+                        }                       
                         if (BarsList.Count > sma)
                         {
                             chart1.Series[2].Points.AddXY(BarsList.Last().Date, ((BarsList.GetRange(BarsList.Count() - sma, sma).Select(p => p.Close).Sum()) / sma));
                         }
-                    }
-                                  
+                    }                                  
             }));
             }
             Strategy1(BarsList, TradesList);
