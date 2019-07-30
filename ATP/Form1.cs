@@ -380,10 +380,12 @@ namespace ATP
                                 sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/12);
                                 break;
                             case StBarInterval.StBarInterval_30Min:
-                                sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/5);
+                                sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/1);
+                                nBars = sma / 2;
                                 break;
                             case StBarInterval.StBarInterval_60Min:
-                                sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/3);
+                                sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/1);
+                                nBars = sma / 2;
                                 break;
                             case StBarInterval.StBarInterval_2Hour:
                                 sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/1.5);
@@ -478,7 +480,7 @@ namespace ATP
                             {
                                 if (t.Count() > 0 && t.Last().State != Collections.Trade.OrderState.Active || t.Count()==0)
                                 {
-                                    t.Add(new Collections.Trade(b[i + 1].Date, b[i + 1].Open, Collections.Trade.OrderType.Buy));                                 
+                                    t.Add(new Collections.Trade(b[i + 1].Date, b[i + 1].Open, Collections.Trade.OrderType.Buy));                               
                                     if (InvokeRequired)
                                     {
                                         Invoke(new MethodInvoker(delegate
