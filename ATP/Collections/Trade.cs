@@ -29,12 +29,12 @@ namespace ATP.Collections
         public double Result { get; set; }        
         public TimeSpan Span { get; set; }
               
-        public Trade(DateTime date, double openPrice, OrderType order)
+        public Trade(DateTime date, double openPrice, OrderType order, double amount)
         {
             OpenDate = date;
             OpenPrice = openPrice;
             Order = order;
-            Amount = 1;          
+            Amount = amount;          
             State = OrderState.Active;
         }
     }

@@ -23,6 +23,7 @@ namespace ATP
         private string Login {get; set;}
         private string Password {get; set;}
         public string symbol = "SBER";
+        public string Portf = "BP15102-MO-01";
         public StBarInterval interval = StBarInterval.StBarInterval_1Min;
         public List<Collections.Bar> BarsList= new List<Collections.Bar>();
         public List<Collections.Portfolio> PortfList = new List<Collections.Portfolio>();
@@ -30,7 +31,8 @@ namespace ATP
         public int n = 100;                  //количество запрашиваемых баров 
         public static int nBars = 30;        //количество баров для отрезка экстремумов
         public int ind = nBars;              //начальный индекс  
-        public int sma;                //количество баров для скользящей средней       
+        public int sma;                //количество баров для скользящей средней  
+        public double money;
         /// <summary>
         /// Инициалезация компонентов
         /// </summary>
@@ -101,7 +103,7 @@ namespace ATP
                     button1.Text = "Отключиться";
                     try
                     {
-                        SmartCom.ListenPortfolio("BP15102-MO-01");
+                        SmartCom.ListenPortfolio(Portf);
                         SmartCom.SetPortfolio += AddPortfolio;
                     }
                     catch (Exception ex)
@@ -141,6 +143,7 @@ namespace ATP
                 {
                     PortfList.Add(new Collections.Portfolio(portfolio, cash, leverage, comission, saldo, liquidationValue, initialMargin, totalAssets));
                     label5.Text = cash.ToString("# ###.#")+"  руб.";
+                    money = cash;
                     label8.Text = saldo.ToString("# ###.#") + "  руб.";
                 }));
             }
@@ -369,7 +372,7 @@ namespace ATP
                                         
                         if (BarsList.Count > sma)
                         {
-                            chart1.Series[2].Points.AddXY(BarsList.Last().Date, ((BarsList.GetRange(BarsList.Count() - sma, sma).Select(p => p.Close).Sum()) / sma));
+                            chart1.Series[2].Points.AddXY(BarsList.Last().Date, ((BarsList.GetRange(BarsList.Count() - sma, sma).Select(p => p.Median).Sum()) / sma));
                         }
                     }                                  
             }));
@@ -403,7 +406,7 @@ namespace ATP
                     {
                         if (i > sma)
                         {
-                            if (b[i].Close > b.GetRange(l, nBars).Select(p => p.High).Max() & b[i].Close > SMA(b.GetRange(i - sma, sma), sma))
+                            if (b[i].Close> b.GetRange(l, nBars).Select(p => p.High).Max() & b[i].Median> SMA(b.GetRange(i - sma, sma), sma))
                             {
                                 BuyOrder(b, t, i);              
                             }
@@ -420,7 +423,7 @@ namespace ATP
         /// <returns></returns>
         private double SMA(List<Collections.Bar> bar, int n)
         {           
-            return ((bar.GetRange(bar.Count - n, n).Select(p => p.Close).Sum()) / n);
+            return ((bar.GetRange(bar.Count - n, n).Select(p => p.Median).Sum()) / n);
         }
         /// <summary>
         /// Метод выставляет ордер на покупку
@@ -432,7 +435,12 @@ namespace ATP
         {
             if (t.Count() > 0 && t.Last().State != Collections.Trade.OrderState.Active || t.Count() == 0)
             {
-                t.Add(new Collections.Trade(b[i + 1].Date, b[i + 1].Open, Collections.Trade.OrderType.Buy));
+                t.Add(new Collections.Trade(b[i + 1].Date, b[i + 1].Open, Collections.Trade.OrderType.Buy, AmountCalculation(money, BarsList)));                
+                //выставляем ордер на биржу
+                if (b[i].Date==DateTime.Today)
+                {
+                    SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Buy, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, t.Last().Amount , 0, Convert.ToInt32(DateTime.Now));
+                }
                 if (InvokeRequired)
                 {
                     Invoke(new MethodInvoker(delegate
@@ -457,7 +465,12 @@ namespace ATP
         public void StopBuy(List<Collections.Bar> b, List<Collections.Trade> t, int i)
         {
             if (t.Last().State != Collections.Trade.OrderState.Close)
-            {
+            {                
+                //выставляем ордер на биржу
+                if (b[i].Date == DateTime.Today)
+                {
+                    SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Sell, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, t.Last().Amount, 0, Convert.ToInt32(DateTime.Now));
+                }
                 t.Last().ClosePrice = b[i + 1].Open;
                 t.Last().CloseDate = b[i + 1].Date;
                 t.Last().Result = t.Last().ClosePrice - t.Last().OpenPrice;
@@ -514,13 +527,15 @@ namespace ATP
                     break;
                 case StBarInterval.StBarInterval_5Min:
                     sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars)) / 2);
+                    nBars = sma / 1;
                     break;
                 case StBarInterval.StBarInterval_10Min:
-                    sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars)) / 1);
+                    sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars)) / 2);
+                    nBars = sma / 1;
                     break;
                 case StBarInterval.StBarInterval_15Min:
                     sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars)) / 1);
-                    nBars = sma / 1;
+                    nBars = sma / 1; 
                     break;
                 case StBarInterval.StBarInterval_30Min:
                     sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars)) / 1);
@@ -540,6 +555,34 @@ namespace ATP
                 default:
                     sma = (int)(BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars));
                     break;
+            }
+        }
+        /// <summary>
+        /// Метод расчета количество лот
+        /// </summary>
+        /// <param name="cash"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        private double AmountCalculation(double cash, List<Collections.Bar> b)
+        {
+            switch(symbol)
+            {
+                case "SBER":
+                    return Math.Round(cash / b.Last().Close * 10/2);
+                case "GAZP":
+                    return Math.Round(cash / b.Last().Close * 10 / 2);
+                case "LKOH":
+                    return Math.Round(cash / b.Last().Close * 1 / 2);
+                case "NLMK":
+                    return Math.Round(cash / b.Last().Close * 10 / 2);
+                case "VTBR":
+                    return Math.Round(cash / b.Last().Close * 10000 / 2);
+                case "SNGSP":
+                    return Math.Round(cash / b.Last().Close * 100 / 2);
+                case "MGNT":
+                    return Math.Round(cash / b.Last().Close * 1 / 2);
+                default:
+                    return Math.Round(cash / b.Last().Close * 10 / 2);
             }
         }
     }

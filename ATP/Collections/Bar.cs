@@ -15,7 +15,8 @@ namespace ATP.Collections
         public double Open { get; set; }
         public double High { get; set; }
         public double Low { get; set; }
-        public double Close { get; set; }       
+        public double Close { get; set; } 
+        public double Median { get; set; }
 
         /// <summary>
         /// Метод-конструктор экземпляра бар
@@ -32,6 +33,7 @@ namespace ATP.Collections
             High = high;
             Low = low;
             Close = close;
+            Median = (open + close + high + low) / 4;
         }
     }
 }
