@@ -368,7 +368,8 @@ namespace ATP
                         switch (interval)
                         {
                             case StBarInterval.StBarInterval_1Min:
-                                sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/50);
+                                sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/3);
+                                nBars = sma / 2;
                                 break;
                             case StBarInterval.StBarInterval_5Min:
                                 sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/30);
@@ -377,11 +378,12 @@ namespace ATP
                                 sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/20);
                                 break;
                             case StBarInterval.StBarInterval_15Min:
-                                sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/12);
+                                sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/1);
+                                nBars = sma / 2;
                                 break;
                             case StBarInterval.StBarInterval_30Min:
                                 sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/1);
-                                nBars = sma / 2;
+                                nBars = sma /2;
                                 break;
                             case StBarInterval.StBarInterval_60Min:
                                 sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars))/1);
