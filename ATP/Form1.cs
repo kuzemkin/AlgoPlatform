@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using SmartCOM4Lib;
+using System.Threading;
 
 
 namespace ATP
@@ -28,6 +29,7 @@ namespace ATP
         public List<Collections.Bar> BarsList= new List<Collections.Bar>();
         public List<Collections.Portfolio> PortfList = new List<Collections.Portfolio>();
         public List<Collections.Trade> TradesList = new List<Collections.Trade>();
+        public List<Collections.Tick> TicksList = new List<Collections.Tick>();
         public int n = 100;                  //количество запрашиваемых баров 
         public static int nBars = 30;        //количество баров для отрезка экстремумов
         public int ind = nBars;              //начальный индекс  
@@ -278,6 +280,7 @@ namespace ATP
             //сбрасываем коллекции к начальному значению
             ind = nBars;
             SmartCom.AddBar -= AddBars;
+            SmartCom.CancelTicks(symbol);
             BarsList.Clear();
             TradesList.Clear();
             ClearSeriesMethod(chart1);
@@ -287,8 +290,13 @@ namespace ATP
             //получаем бары
             try
             {
-                SmartCom.GetBars(symbol, interval, new DateTime(SetDateTime(interval,n).Year, SetDateTime(interval, n).Month, SetDateTime(interval, n).Day, SetDateTime(interval, n).Hour, SetDateTime(interval, n).Minute, SetDateTime(interval, n).Second), - n);
                 SmartCom.AddBar += AddBars;
+                SmartCom.GetBars(symbol, interval, DateTime.Today,
+                    //new DateTime(SetDateTime(interval,n).Year, SetDateTime(interval, n).Month, SetDateTime(interval, n).Day, SetDateTime(interval, n).Hour, SetDateTime(interval, n).Minute, SetDateTime(interval, n).Second), 
+                    -n);
+                Thread.Sleep(10000);
+                SmartCom.AddTick += AddTicks;
+                SmartCom.ListenTicks(symbol);
             }
             catch { label3.Text = $"[{DateTime.Now}]: Возникла ошибка!"; }
         }
@@ -352,33 +360,61 @@ namespace ATP
         /// <param name="open_int"></param>
         private void AddBars(int row, int nrows, string symbol, StBarInterval interval, DateTime date, double open, double high, double low, double close, double volume, double open_int)
         {
-            BarsList.Add(new Collections.Bar(date, open, high, low, close));
+            BarsList.Add(new Collections.Bar(date, open, high, low, close)); 
             //
-            //ниже представлена инстуркция, регулирующая масштаб графика
+            //добавляем данные на график
             //
             if (InvokeRequired)
             {
                 Invoke(new MethodInvoker(delegate
                 {                    
                     chart1.Series[0].Points.AddXY(date, high, low, open, close);                    
+                    //
+                    //ниже представлена инстуркция, регулирующая масштаб графика
+                    //
                     if (BarsList.Count>nBars)
                     {                        
                        chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])-(Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[0])- chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])));
                     }
+                    //
                     //добавляем скользящую среднею на график
+                    //
                     if (BarsList.Count() > nBars)
                     {
-                        SMACalculation();
-                                        
+                        SMACalculation();                        
                         if (BarsList.Count > sma)
                         {
                             chart1.Series[2].Points.AddXY(BarsList.Last().Date, ((BarsList.GetRange(BarsList.Count() - sma, sma).Select(p => p.Median).Sum()) / sma));
                         }
-                    }                                  
-            }));
+                    }                    
+                }));                 
+            }
+            else
+            {
+                chart1.Series[0].Points.AddXY(date, high, low, open, close);
             }
             Strategy1(BarsList, TradesList);
-        }    
+        }
+        private void AddTicks(string symbol, DateTime date, double price, double volume, string id, StOrder_Action action)
+        {
+            TicksList.Add(new Collections.Tick(symbol, date, price, volume, id, action));
+            TimeSpan span = TicksList.Last().date - TicksList[0].date;
+            if(span.Minutes==1)
+            {
+                if (InvokeRequired)
+                {
+                    Invoke(new MethodInvoker(delegate
+                    {
+                        chart1.Series[0].Points.AddXY(date, TicksList.Select(n=>n.Price).Max, TicksList.Select(n=>n.Price).Min, TicksList[0].Price, TicksList.Last().Price);
+                    }));
+                }
+                else
+                {
+                    chart1.Series[0].Points.AddXY(date, TicksList.Select(n => n.Price).Max, TicksList.Select(n => n.Price).Min, TicksList[0].Price, TicksList.Last().Price);
+                }
+                TicksList.Clear;
+            }
+        }
         /// <summary>
         /// Метод создания трейда при соблюдении условий
         /// </summary>
@@ -439,7 +475,7 @@ namespace ATP
                 //выставляем ордер на биржу
                 if (b[i].Date==DateTime.Today)
                 {
-                    SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Buy, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, t.Last().Amount , 0, Convert.ToInt32(DateTime.Now));
+                    SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Buy, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, t.Last().Amount , 0, Convert.ToInt32(DateTime.Now.ToBinary()));
                 }
                 if (InvokeRequired)
                 {
@@ -469,7 +505,7 @@ namespace ATP
                 //выставляем ордер на биржу
                 if (b[i].Date == DateTime.Today)
                 {
-                    SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Sell, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, t.Last().Amount, 0, Convert.ToInt32(DateTime.Now));
+                    SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Sell, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, t.Last().Amount, 0, Convert.ToInt32(DateTime.Now.ToBinary()));
                 }
                 t.Last().ClosePrice = b[i + 1].Open;
                 t.Last().CloseDate = b[i + 1].Date;
@@ -522,8 +558,8 @@ namespace ATP
             switch (interval)
             {
                 case StBarInterval.StBarInterval_1Min:
-                    sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars)) / 3);
-                    nBars = sma / 2;
+                    sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars)) / 4);
+                    nBars = sma ;
                     break;
                 case StBarInterval.StBarInterval_5Min:
                     sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars)) / 2);
@@ -581,6 +617,8 @@ namespace ATP
                     return Math.Round(cash / b.Last().Close * 100 / 2);
                 case "MGNT":
                     return Math.Round(cash / b.Last().Close * 1 / 2);
+                case "Si-9.19_FT":
+                    return 1;
                 default:
                     return Math.Round(cash / b.Last().Close * 10 / 2);
             }

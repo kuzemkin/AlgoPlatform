@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="Collections\Bar.cs" />
     <Compile Include="Collections\Portfolio.cs" />
+    <Compile Include="Collections\Tick.cs" />
     <Compile Include="Collections\Trade.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
