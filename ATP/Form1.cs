@@ -410,8 +410,8 @@ namespace ATP
             
             if(TicksList.Last().Date.Second==00)
             {
-                AddBars(BarsList.Count - 1, BarsList.Count, symbol, interval, TicksList.Last().Date, TicksList[0].Price, TicksList.Select(n => n.Price).Max, TicksList.Select(n => n.Price).Min, TicksList.Last().Price, TicksList.Select(n => n.Volum).Sum, 0);
-                TicksList.Clear;
+                AddBars(BarsList.Count - 1, BarsList.Count, symbol, interval, TicksList.Last().Date, TicksList[0].Price, TicksList.Select(n => n.Price).Max(), TicksList.Select(n => n.Price).Min(), TicksList.Last().Price, TicksList.Select(n => n.Volume).Sum(), 0);
+                TicksList.Clear();
             }
         }
         /// <summary>

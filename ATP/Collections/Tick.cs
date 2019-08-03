@@ -9,12 +9,12 @@ namespace ATP.Collections
 {
     public class Tick
     {
-        string Symbol { get; set; }
-        DateTime Date { get; set; }
-        double Price { get; set; }
-        double Volume { get; set; }
-        string Id { get; set; }
-        StOrder_Action Action { get; set; }
+        public string Symbol { get; set; }
+        public DateTime Date { get; set; }
+        public double Price { get; set; }
+        public double Volume { get; set; }
+        public string Id { get; set; }
+        public StOrder_Action Action { get; set; }
         /// <summary>
         /// Конструктор объекта Тик
         /// </summary>
