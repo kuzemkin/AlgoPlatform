@@ -395,23 +395,22 @@ namespace ATP
             }
             Strategy1(BarsList, TradesList);
         }
+        /// <summary>
+        /// Метод добавления Тиков
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="date"></param>
+        /// <param name="price"></param>
+        /// <param name="volume"></param>
+        /// <param name="id"></param>
+        /// <param name="action"></param>
         private void AddTicks(string symbol, DateTime date, double price, double volume, string id, StOrder_Action action)
         {
             TicksList.Add(new Collections.Tick(symbol, date, price, volume, id, action));
-            TimeSpan span = TicksList.Last().date - TicksList[0].date;
-            if(span.Minutes==1)
+            
+            if(TicksList.Last().Date.Second==00)
             {
-                if (InvokeRequired)
-                {
-                    Invoke(new MethodInvoker(delegate
-                    {
-                        chart1.Series[0].Points.AddXY(date, TicksList.Select(n=>n.Price).Max, TicksList.Select(n=>n.Price).Min, TicksList[0].Price, TicksList.Last().Price);
-                    }));
-                }
-                else
-                {
-                    chart1.Series[0].Points.AddXY(date, TicksList.Select(n => n.Price).Max, TicksList.Select(n => n.Price).Min, TicksList[0].Price, TicksList.Last().Price);
-                }
+                AddBars(BarsList.Count - 1, BarsList.Count, symbol, interval, TicksList.Last().Date, TicksList[0].Price, TicksList.Select(n => n.Price).Max, TicksList.Select(n => n.Price).Min, TicksList.Last().Price, TicksList.Select(n => n.Volum).Sum, 0);
                 TicksList.Clear;
             }
         }
