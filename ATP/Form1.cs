@@ -291,8 +291,9 @@ namespace ATP
             try
             {
                 SmartCom.AddBar += AddBars;
-                SmartCom.GetBars(symbol, interval, DateTime.Today,
-                    //new DateTime(SetDateTime(interval,n).Year, SetDateTime(interval, n).Month, SetDateTime(interval, n).Day, SetDateTime(interval, n).Hour, SetDateTime(interval, n).Minute, SetDateTime(interval, n).Second), 
+                SmartCom.GetBars(symbol, interval, 
+                    //DateTime.Today,
+                    new DateTime(SetDateTime(interval,n).Year, SetDateTime(interval, n).Month, SetDateTime(interval, n).Day, SetDateTime(interval, n).Hour, SetDateTime(interval, n).Minute, SetDateTime(interval, n).Second), 
                     -n);
                 Thread.Sleep(10000);
                 SmartCom.AddTick += AddTicks;
@@ -424,9 +425,9 @@ namespace ATP
             if (t.Count>0 && t.Last().State==Collections.Trade.OrderState.Active)
             {
                 //условия выхода
-                for (int l=ind-nBars/4, i = ind+1; i+1 < b.Count(); i++, l++)
+                for (int l=ind-nBars/10, i = ind+1; i+1 < b.Count(); i++, l++)
                 {
-                    if (b[i].Close < b.GetRange(l, nBars/4).Select(p => p.Low).Min())
+                    if (b[i].Close < b.GetRange(l, nBars/10).Select(p => p.Low).Min())
                     {
                         StopBuy(b, t, i);
                     }
@@ -557,7 +558,7 @@ namespace ATP
             switch (interval)
             {
                 case StBarInterval.StBarInterval_1Min:
-                    sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars)) / 4);
+                    sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars)) / 10);
                     nBars = sma ;
                     break;
                 case StBarInterval.StBarInterval_5Min:
