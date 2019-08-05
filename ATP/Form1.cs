@@ -26,6 +26,7 @@ namespace ATP
         public string symbol = "SBER";
         public string Portf = "BP15102-MO-01";
         public StBarInterval interval = StBarInterval.StBarInterval_1Min;
+        private static System.Windows.Forms.Timer Timer = new System.Windows.Forms.Timer(); 
         public List<Collections.Bar> BarsList= new List<Collections.Bar>();
         public List<Collections.Portfolio> PortfList = new List<Collections.Portfolio>();
         public List<Collections.Trade> TradesList = new List<Collections.Trade>();
@@ -40,7 +41,10 @@ namespace ATP
         /// </summary>
         public Form1()
         {
-            InitializeComponent();           
+            InitializeComponent();
+            Timer.Tick += CheckTime;
+            Timer.Interval = 1000;
+            Timer.Start();
         }
         /// <summary>
         /// Метод инициалезации поля Login
@@ -283,6 +287,7 @@ namespace ATP
             SmartCom.CancelTicks(symbol);
             BarsList.Clear();
             TradesList.Clear();
+            TicksList.Clear();
             ClearSeriesMethod(chart1);
             ClearMethod(chart1.Series);
             ClearMethod(chart2.Series);
@@ -293,10 +298,9 @@ namespace ATP
                 SmartCom.AddBar += AddBars;
                 SmartCom.GetBars(symbol, interval, DateTime.Today,
                     //new DateTime(SetDateTime(interval,n).Year, SetDateTime(interval, n).Month, SetDateTime(interval, n).Day, SetDateTime(interval, n).Hour, SetDateTime(interval, n).Minute, SetDateTime(interval, n).Second), 
-                    -n);
-                Thread.Sleep(10000);
+                    -n);                
                 SmartCom.AddTick += AddTicks;
-                SmartCom.ListenTicks(symbol);
+                SmartCom.ListenTicks(symbol);                
             }
             catch { label3.Text = $"[{DateTime.Now}]: Возникла ошибка!"; }
         }
@@ -373,8 +377,9 @@ namespace ATP
                     //ниже представлена инстуркция, регулирующая масштаб графика
                     //
                     if (BarsList.Count>nBars)
-                    {                        
-                       chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])-(Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[0])- chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])));
+                    {                     
+                        chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])-(Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[0])- chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])));
+                        chart1.ChartAreas[0].AxisX.MaximumAutoSize=100;
                     }
                     //
                     //добавляем скользящую среднею на график
@@ -406,9 +411,14 @@ namespace ATP
         /// <param name="action"></param>
         private void AddTicks(string symbol, DateTime date, double price, double volume, string id, StOrder_Action action)
         {
-            TicksList.Add(new Collections.Tick(symbol, date, price, volume, id, action));
-            
-            if(TicksList.Last().Date.Second==00)
+            TicksList.Add(new Collections.Tick(symbol, date, price, volume, id, action));          
+        }
+        /// <summary>
+        /// Метод проверки времени
+        /// </summary>
+        private void CheckTime(object myobject, EventArgs eventArgs)
+        {
+            if (DateTime.Now.Second == 00)
             {
                 AddBars(BarsList.Count - 1, BarsList.Count, symbol, interval, TicksList.Last().Date, TicksList[0].Price, TicksList.Select(n => n.Price).Max(), TicksList.Select(n => n.Price).Min(), TicksList.Last().Price, TicksList.Select(n => n.Volume).Sum(), 0);
                 TicksList.Clear();
@@ -424,9 +434,9 @@ namespace ATP
             if (t.Count>0 && t.Last().State==Collections.Trade.OrderState.Active)
             {
                 //условия выхода
-                for (int l=ind-nBars/4, i = ind+1; i+1 < b.Count(); i++, l++)
+                for (int l=ind-nBars/10, i = ind+1; i+1 < b.Count(); i++, l++)
                 {
-                    if (b[i].Close < b.GetRange(l, nBars/4).Select(p => p.Low).Min())
+                    if (b[i].Close < b.GetRange(l, nBars/10).Select(p => p.Low).Min())
                     {
                         StopBuy(b, t, i);
                     }
@@ -557,7 +567,7 @@ namespace ATP
             switch (interval)
             {
                 case StBarInterval.StBarInterval_1Min:
-                    sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars)) / 4);
+                    sma = (int)((BarsList.Last().Close / ((BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.High).Sum() - (BarsList.GetRange(BarsList.Count() - nBars, nBars).Select(m => m.Low).Sum())) / nBars)) / 10);
                     nBars = sma ;
                     break;
                 case StBarInterval.StBarInterval_5Min:
