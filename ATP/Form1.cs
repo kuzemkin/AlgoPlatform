@@ -379,7 +379,7 @@ namespace ATP
                     if (BarsList.Count>nBars)
                     {                     
                         chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])-(Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[0])- chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])));
-                        chart1.ChartAreas[0].AxisX.MaximumAutoSize=100;
+                       
                     }
                     //
                     //добавляем скользящую среднею на график
@@ -418,10 +418,13 @@ namespace ATP
         /// </summary>
         private void CheckTime(object myobject, EventArgs eventArgs)
         {
-            if (DateTime.Now.Second == 00)
+            if (DateTime.Now.Second == 00 & TicksList.Count>0)
             {
-                AddBars(BarsList.Count - 1, BarsList.Count, symbol, interval, TicksList.Last().Date, TicksList[0].Price, TicksList.Select(n => n.Price).Max(), TicksList.Select(n => n.Price).Min(), TicksList.Last().Price, TicksList.Select(n => n.Volume).Sum(), 0);
-                TicksList.Clear();
+                if (BarsList.Last().Date.Minute != TicksList.Last().Date.Minute)
+                {
+                    AddBars(BarsList.Count - 1, BarsList.Count, symbol, interval, TicksList.Last().Date, TicksList[0].Price, TicksList.Select(n => n.Price).Max(), TicksList.Select(n => n.Price).Min(), TicksList.Last().Price, TicksList.Select(n => n.Volume).Sum(), 0);
+                    TicksList.Clear();
+                }
             }
         }
         /// <summary>
