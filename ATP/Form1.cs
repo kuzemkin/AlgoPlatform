@@ -440,6 +440,7 @@ namespace ATP
                     //условия входа
                     for (int l = ind - nBars, i = ind + 1; i + 1 < b.Count(); i++, l++)
                     {
+                        //MessageBox.Show((b.GetRange(l, nBars).Select(p => p.Close).Max() - b.GetRange(l, nBars).Select(p => p.Close).Min()).ToString());
                         if (i > sma)
                         {
                             if (b[i].Close> b.GetRange(l, nBars).Select(p => p.High).Max() & b[i].Median> SMA(b.GetRange(i - sma, sma), sma))
