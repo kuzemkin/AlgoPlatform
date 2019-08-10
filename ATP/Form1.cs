@@ -33,7 +33,7 @@ namespace ATP
         public int n = 100;                  //количество запрашиваемых баров 
         public static int nBars = 30;        //количество баров для отрезка экстремумов
         public int ind = nBars;              //начальный индекс  
-        public int sma;                //количество баров для скользящей средней  
+        public int sma=100;                //количество баров для скользящей средней  
         public double money;
         /// <summary>
         /// Инициалезация компонентов
@@ -382,7 +382,7 @@ namespace ATP
                     //
                     if (BarsList.Count() > nBars)
                     {
-                        SMACalculation();                        
+                        //SMACalculation();                        
                         if (BarsList.Count > sma)
                         {
                             chart1.Series[2].Points.AddXY(BarsList.Last().Date, ((BarsList.GetRange(BarsList.Count() - sma, sma).Select(p => p.Median).Sum()) / sma));
