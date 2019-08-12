@@ -30,6 +30,7 @@ namespace ATP
         public List<Collections.Portfolio> PortfList = new List<Collections.Portfolio>();
         public List<Collections.Trade> TradesList = new List<Collections.Trade>();
         public List<Collections.Tick> TicksList = new List<Collections.Tick>();
+        public List<double> SDeviation = new List<double>();
         public int n = 100;                  //количество запрашиваемых баров 
         public static int nBars = 30;        //количество баров для отрезка экстремумов
         public int ind = nBars;              //начальный индекс  
@@ -440,7 +441,7 @@ namespace ATP
                     //условия входа
                     for (int l = ind - nBars, i = ind + 1; i + 1 < b.Count(); i++, l++)
                     {
-                        //MessageBox.Show((b.GetRange(l, nBars).Select(p => p.Close).Max() - b.GetRange(l, nBars).Select(p => p.Close).Min()).ToString());
+                        SDeviation.Add(b.GetRange(l, nBars).Select(p => p.Close).Max() - b.GetRange(l, nBars).Select(p => p.Close).Min());
                         if (i > sma)
                         {
                             if (b[i].Close> b.GetRange(l, nBars).Select(p => p.High).Max() & b[i].Median> SMA(b.GetRange(i - sma, sma), sma))
@@ -623,6 +624,10 @@ namespace ATP
                 default:
                     return Math.Round(cash / b.Last().Close * 10 / 2);
             }
+        }
+        private double SDeviationCalculate(List<double> deviation)
+        {
+            return 1;
         }
     }
 }
