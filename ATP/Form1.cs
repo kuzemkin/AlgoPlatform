@@ -32,7 +32,7 @@ namespace ATP
         public List<Collections.Trade> TradesList = new List<Collections.Trade>();
         public List<Collections.Tick> TicksList = new List<Collections.Tick>();
         public int n = 100;                  //количество запрашиваемых баров 
-        public static int nBars = 50;        //количество баров для отрезка экстремумов
+        public static int nBars = 25;        //количество баров для отрезка экстремумов
         public int ind = nBars;              //начальный индекс  
         public int sma=50;                //количество баров для скользящей средней  
         public double money;
@@ -416,6 +416,7 @@ namespace ATP
         {            
             if (DateTime.Now.Second == 00 & TicksList.Count > 0 && BarsList.Count>sma)
             {
+                TicksList.Last().Date.AddMinutes(1);
                 AddBars(BarsList.Count - 1, BarsList.Count, symbol, interval, (new DateTime(TicksList.Last().Date.Year, TicksList.Last().Date.Month, TicksList.Last().Date.Day, TicksList.Last().Date.Hour, TicksList.Last().Date.Minute, 00)), TicksList[0].Price, TicksList.Select(n => n.Price).Max(), TicksList.Select(n => n.Price).Min(), TicksList.Last().Price, TicksList.Select(n => n.Volume).Sum(), 0);
                 TicksList.Clear();
             }
@@ -430,9 +431,9 @@ namespace ATP
             if (t.Count>0 && t.Last().State==Collections.Trade.OrderState.Active)
             {
                 //условия выхода
-                for (int l=ind-nBars/10, i = ind+1; i+1 < b.Count(); i++, l++)
+                for (int l=ind-nBars, i = ind+1; i+1 < b.Count(); i++, l++)
                 {
-                    if (b[i].Close < b.GetRange(l, nBars/10).Select(p => p.Low).Min())
+                    if (b[i].Close < b.GetRange(l, nBars).Select(p => p.Low).Min())
                     {
                         StopBuy(b, t, i);
                     }
@@ -478,7 +479,7 @@ namespace ATP
             {
                 t.Add(new Collections.Trade(b[i + 1].Date, b[i + 1].Open, Collections.Trade.OrderType.Buy, AmountCalculation(money, BarsList)));                
                 //выставляем ордер на биржу
-                if (b[i].Date.Minute==DateTime.Now.Minute)
+                if (b[i].Date.Minute == DateTime.Now.Minute & b[i].Date.Hour == DateTime.Now.Hour & b[i].Date.Day == DateTime.Now.Day)
                 {
                     SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Buy, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, t.Last().Amount , 0, Convert.ToInt32(DateTime.Now.ToBinary()));
                 }
@@ -508,7 +509,7 @@ namespace ATP
             if (t.Last().State != Collections.Trade.OrderState.Close)
             {                
                 //выставляем ордер на биржу
-                if (b[i].Date.Minute == DateTime.Now.Minute)
+                if (b[i].Date.Minute == DateTime.Now.Minute & b[i].Date.Hour==DateTime.Now.Hour & b[i].Date.Day == DateTime.Now.Day)
                 {
                     SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Sell, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, t.Last().Amount, 0, Convert.ToInt32(DateTime.Now.ToBinary()));
                 }
