@@ -432,7 +432,7 @@ namespace ATP
                     if(InvokeRequired)
                     {
                         Invoke(new MethodInvoker(delegate
-                        {
+                        {                            
                             chart1.Series[0].Points.Last().YValues[3] = TicksList.Last().Price;
                         }));
                     }
@@ -443,8 +443,15 @@ namespace ATP
                 }
                 else
                 {
-                    TicksList.Last().Date.AddMinutes(1);
-                    AddBars(BarsList.Count - 1, BarsList.Count, symbol, interval, (new DateTime(TicksList.Last().Date.Year, TicksList.Last().Date.Month, TicksList.Last().Date.Day, TicksList.Last().Date.Hour, TicksList.Last().Date.Minute, 00)), TicksList[0].Price, TicksList.Select(n => n.Price).Max(), TicksList.Select(n => n.Price).Min(), TicksList.Last().Price, TicksList.Select(n => n.Volume).Sum(), 0);
+                   if(TicksList.Last().Date.Second!=0)
+                    {
+                        TicksList.Last().Date.AddMinutes(1);
+                        AddBars(BarsList.Count+1 , BarsList.Count, symbol, interval, (new DateTime(TicksList.Last().Date.Year, TicksList.Last().Date.Month, TicksList.Last().Date.Day, TicksList.Last().Date.Hour, TicksList.Last().Date.Minute, 00)), TicksList[0].Price, TicksList.Select(n => n.Price).Max(), TicksList.Select(n => n.Price).Min(), TicksList.Last().Price, TicksList.Select(n => n.Volume).Sum(), 0);
+                    }
+                   else
+                    {
+                         AddBars(BarsList.Count+1, BarsList.Count, symbol, interval, (new DateTime(TicksList.Last().Date.Year, TicksList.Last().Date.Month, TicksList.Last().Date.Day, TicksList.Last().Date.Hour, TicksList.Last().Date.Minute, 00)), TicksList[0].Price, TicksList.Select(n => n.Price).Max(), TicksList.Select(n => n.Price).Min(), TicksList.Last().Price, TicksList.Select(n => n.Volume).Sum(), 0);
+                    }
                 }                
                 TicksList.Clear();
             }
