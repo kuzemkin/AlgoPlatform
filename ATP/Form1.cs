@@ -427,15 +427,25 @@ namespace ATP
         {            
             if (DateTime.Now.Second == 00 & TicksList.Count > 0 && BarsList.Count>sma)
             {
-                if(TicksList.Last().Date.Second!=00)
+                if(BarsList.Last().Date.Minute==TicksList.Last().Date.Minute)
+                {
+                    if(InvokeRequired)
+                    {
+                        Invoke(new MethodInvoker(delegate
+                        {
+                            chart1.Series[0].Points.Last().YValues[3] = TicksList.Last().Price;
+                        }));
+                    }
+                    else
+                    {
+                        chart1.Series[0].Points.Last().YValues[3] = TicksList.Last().Price;
+                    }
+                }
+                else
                 {
                     TicksList.Last().Date.AddMinutes(1);
                     AddBars(BarsList.Count - 1, BarsList.Count, symbol, interval, (new DateTime(TicksList.Last().Date.Year, TicksList.Last().Date.Month, TicksList.Last().Date.Day, TicksList.Last().Date.Hour, TicksList.Last().Date.Minute, 00)), TicksList[0].Price, TicksList.Select(n => n.Price).Max(), TicksList.Select(n => n.Price).Min(), TicksList.Last().Price, TicksList.Select(n => n.Volume).Sum(), 0);
-                }
-                else
-                {                    
-                    AddBars(BarsList.Count - 1, BarsList.Count, symbol, interval, TicksList.Last().Date, TicksList[0].Price, TicksList.Select(n => n.Price).Max(), TicksList.Select(n => n.Price).Min(), TicksList.Last().Price, TicksList.Select(n => n.Volume).Sum(), 0);
-                }
+                }                
                 TicksList.Clear();
             }
         }
