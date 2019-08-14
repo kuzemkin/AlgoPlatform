@@ -394,6 +394,14 @@ namespace ATP
             {
                 chart1.Series[0].Points.AddXY(date, high, low, open, close);
                 chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1]) - (Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[0]) - chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])));
+                if (BarsList.Count() > nBars)
+                {
+                    SMACalculation();
+                    if (BarsList.Count > sma)
+                    {
+                        chart1.Series[2].Points.AddXY(BarsList.Last().Date, ((BarsList.GetRange(BarsList.Count() - sma, sma).Select(p => p.Median).Sum()) / sma));
+                    }
+                }
             }
             Strategy1(BarsList, TradesList);
         }
@@ -503,6 +511,15 @@ namespace ATP
                         chart1.Series.Last().Points.AddXY(b[i + 1].Date, b[i + 1].Open);
                     }));
                 }
+                else
+                {
+                    label10.Text = t.Count().ToString();
+                    chart1.Series[1].Points.AddXY(b[i + 1].Date, b[i + 1].Open);
+                    chart1.Series.Add(b[i].Date.ToString());
+                    chart1.Series.Last().ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+                    chart1.Series.Last().Color = System.Drawing.Color.Blue;
+                    chart1.Series.Last().Points.AddXY(b[i + 1].Date, b[i + 1].Open);
+                }
                 ind = b.FindLastIndex(p => p.Date == t.Last().OpenDate);
             }
         }
@@ -560,6 +577,38 @@ namespace ATP
                         chart1.Series.Last().Points.AddXY(b[i + 1].Date, b[i + 1].Open);
                         chart2.Series[0].Points.AddXY(t.Last().CloseDate, t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(r => r.Result).Sum());
                     }));
+                }
+                else
+                {
+                    label12.Text = t.Where(n => n.Result > 0).Select(m => m).Count().ToString();
+                    label14.Text = t.Where(n => n.Result < 0).Select(m => m).Count().ToString();
+                    label16.Text = Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum(), 1).ToString();
+                    label19.Text = Math.Round((t.Where(r => r.Result > 0).Select(s => s.Result).Sum()) / Math.Abs(t.Where(r => r.Result < 0).Select(s => s.Result).Sum()), 2).ToString();
+                    label21.Text = Math.Round((b.Last().Close - b[0].Open), 2).ToString();
+                    switch (interval)
+                    {
+                        case StBarInterval.StBarInterval_Day:
+                            label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalDays) / t.Count())).ToString();
+                            break;
+                        case StBarInterval.StBarInterval_Week:
+                            label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalDays) / t.Count())).ToString();
+                            break;
+                        case StBarInterval.StBarInterval_60Min:
+                            label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalHours) / t.Count())).ToString();
+                            break;
+                        case StBarInterval.StBarInterval_2Hour:
+                            label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalHours) / t.Count())).ToString();
+                            break;
+                        case StBarInterval.StBarInterval_4Hour:
+                            label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalHours) / t.Count())).ToString();
+                            break;
+                        default:
+                            label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalMinutes) / t.Count())).ToString();
+                            break;
+                    }
+                    chart1.Series[1].Points.AddXY(b[i + 1].Date, b[i + 1].Open);
+                    chart1.Series.Last().Points.AddXY(b[i + 1].Date, b[i + 1].Open);
+                    chart2.Series[0].Points.AddXY(t.Last().CloseDate, t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(r => r.Result).Sum());
                 }
                 ind = b.FindLastIndex(p => p.Date == t.Last().CloseDate);
             }
