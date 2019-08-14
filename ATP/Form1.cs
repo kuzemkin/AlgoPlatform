@@ -32,10 +32,12 @@ namespace ATP
         public List<Collections.Trade> TradesList = new List<Collections.Trade>();
         public List<Collections.Tick> TicksList = new List<Collections.Tick>();
         public int n = 100;                  //количество запрашиваемых баров 
-        public static int nBars = 25;        //количество баров для отрезка экстремумов
+        public static int nBars = 12;        //количество баров для отрезка экстремумов
         public int ind = nBars;              //начальный индекс  
-        public int sma=50;                //количество баров для скользящей средней  
+        public int sma=24;                //количество баров для скользящей средней  
         public double money;
+        public bool isReal=false;          //признак реальных торгов;
+        public int orderId = 0;             //идентификатор заявок
         /// <summary>
         /// Инициалезация компонентов
         /// </summary>
@@ -495,9 +497,10 @@ namespace ATP
             {
                 t.Add(new Collections.Trade(b[i + 1].Date, b[i + 1].Open, Collections.Trade.OrderType.Buy, AmountCalculation(money, BarsList)));                
                 //выставляем ордер на биржу
-                if (b[i].Date.Minute == DateTime.Now.Minute & b[i].Date.Hour == DateTime.Now.Hour & b[i].Date.Day == DateTime.Now.Day)
+                if (isReal==true)
                 {
-                    SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Buy, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, t.Last().Amount , 0, Convert.ToInt32(DateTime.Now.ToBinary()));
+                    SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Buy, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, t.Last().Amount , 0, orderId);
+                    orderId++;
                 }
                 if (InvokeRequired)
                 {
@@ -534,9 +537,10 @@ namespace ATP
             if (t.Last().State != Collections.Trade.OrderState.Close)
             {                
                 //выставляем ордер на биржу
-                if (b[i].Date.Minute == DateTime.Now.Minute & b[i].Date.Hour==DateTime.Now.Hour & b[i].Date.Day == DateTime.Now.Day)
+                if (isReal == true)
                 {
-                    SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Sell, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, t.Last().Amount, 0, Convert.ToInt32(DateTime.Now.ToBinary()));
+                    SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Sell, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, t.Last().Amount, 0, orderId);
+                    orderId++;
                 }
                 t.Last().ClosePrice = b[i + 1].Open;
                 t.Last().CloseDate = b[i + 1].Date;
@@ -684,6 +688,18 @@ namespace ATP
                     return 1;
                 default:
                     return Math.Round(cash / b.Last().Close * 10 / 2);
+            }
+        }
+
+        private void CheckBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if(checkBox1.Checked)
+            {
+                isReal = true;
+            }
+            else
+            {
+                isReal = false;
             }
         }
     }

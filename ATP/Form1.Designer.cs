@@ -49,6 +49,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.label17 = new System.Windows.Forms.Label();
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
@@ -90,10 +91,10 @@
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Location = new System.Drawing.Point(-2, 1);
-            this.tabControl1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabControl1.Margin = new System.Windows.Forms.Padding(2);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(602, 366);
+            this.tabControl1.Size = new System.Drawing.Size(1000, 490);
             this.tabControl1.TabIndex = 0;
             // 
             // tabPage1
@@ -103,10 +104,10 @@
             this.tabPage1.Controls.Add(this.groupBox1);
             this.tabPage1.Controls.Add(this.button1);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage1.Margin = new System.Windows.Forms.Padding(2);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.tabPage1.Size = new System.Drawing.Size(594, 340);
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(2);
+            this.tabPage1.Size = new System.Drawing.Size(992, 464);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Главный экран";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -118,9 +119,9 @@
             this.groupBox2.Controls.Add(this.label6);
             this.groupBox2.Controls.Add(this.label5);
             this.groupBox2.Location = new System.Drawing.Point(227, 21);
-            this.groupBox2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(2);
             this.groupBox2.Size = new System.Drawing.Size(348, 106);
             this.groupBox2.TabIndex = 8;
             this.groupBox2.TabStop = false;
@@ -182,9 +183,9 @@
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(20, 21);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(2);
             this.groupBox1.Size = new System.Drawing.Size(166, 106);
             this.groupBox1.TabIndex = 5;
             this.groupBox1.TabStop = false;
@@ -193,7 +194,7 @@
             // textBox1
             // 
             this.textBox1.Location = new System.Drawing.Point(4, 37);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(2);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(129, 20);
             this.textBox1.TabIndex = 0;
@@ -202,7 +203,7 @@
             // textBox2
             // 
             this.textBox2.Location = new System.Drawing.Point(4, 77);
-            this.textBox2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBox2.Margin = new System.Windows.Forms.Padding(2);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(129, 20);
             this.textBox2.TabIndex = 1;
@@ -231,7 +232,7 @@
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(47, 143);
-            this.button1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.button1.Margin = new System.Windows.Forms.Padding(2);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(98, 24);
             this.button1.TabIndex = 4;
@@ -241,6 +242,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.checkBox1);
             this.tabPage2.Controls.Add(this.label17);
             this.tabPage2.Controls.Add(this.textBox4);
             this.tabPage2.Controls.Add(this.button2);
@@ -249,13 +251,24 @@
             this.tabPage2.Controls.Add(this.label4);
             this.tabPage2.Controls.Add(this.chart1);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage2.Margin = new System.Windows.Forms.Padding(2);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.tabPage2.Size = new System.Drawing.Size(594, 340);
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(2);
+            this.tabPage2.Size = new System.Drawing.Size(992, 464);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "График";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(525, 19);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(124, 17);
+            this.checkBox1.TabIndex = 6;
+            this.checkBox1.Text = "Реальная торговля";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.CheckBox1_CheckedChanged);
             // 
             // label17
             // 
@@ -270,7 +283,7 @@
             // textBox4
             // 
             this.textBox4.Location = new System.Drawing.Point(470, 16);
-            this.textBox4.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBox4.Margin = new System.Windows.Forms.Padding(2);
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(36, 20);
             this.textBox4.TabIndex = 0;
@@ -281,7 +294,7 @@
             // button2
             // 
             this.button2.Location = new System.Drawing.Point(270, 16);
-            this.button2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.button2.Margin = new System.Windows.Forms.Padding(2);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 20);
             this.button2.TabIndex = 4;
@@ -304,7 +317,7 @@
             "1 день",
             "1 неделя"});
             this.comboBox1.Location = new System.Drawing.Point(180, 16);
-            this.comboBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.comboBox1.Margin = new System.Windows.Forms.Padding(2);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(76, 21);
             this.comboBox1.TabIndex = 3;
@@ -314,7 +327,7 @@
             // textBox3
             // 
             this.textBox3.Location = new System.Drawing.Point(90, 16);
-            this.textBox3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBox3.Margin = new System.Windows.Forms.Padding(2);
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(76, 20);
             this.textBox3.TabIndex = 2;
@@ -348,7 +361,7 @@
             chartArea1.Name = "ChartArea1";
             this.chart1.ChartAreas.Add(chartArea1);
             this.chart1.Location = new System.Drawing.Point(0, 41);
-            this.chart1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.chart1.Margin = new System.Windows.Forms.Padding(2);
             this.chart1.Name = "chart1";
             series1.BorderColor = System.Drawing.Color.Black;
             series1.ChartArea = "ChartArea1";
@@ -376,7 +389,7 @@
             this.chart1.Series.Add(series1);
             this.chart1.Series.Add(series2);
             this.chart1.Series.Add(series3);
-            this.chart1.Size = new System.Drawing.Size(594, 301);
+            this.chart1.Size = new System.Drawing.Size(739, 301);
             this.chart1.TabIndex = 0;
             this.chart1.Text = "chart1";
             // 
@@ -385,10 +398,10 @@
             this.tabPage3.Controls.Add(this.chart2);
             this.tabPage3.Controls.Add(this.groupBox3);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
-            this.tabPage3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage3.Margin = new System.Windows.Forms.Padding(2);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.tabPage3.Size = new System.Drawing.Size(594, 340);
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(2);
+            this.tabPage3.Size = new System.Drawing.Size(992, 464);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Результат";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -398,7 +411,7 @@
             chartArea2.Name = "ChartArea1";
             this.chart2.ChartAreas.Add(chartArea2);
             this.chart2.Location = new System.Drawing.Point(287, 15);
-            this.chart2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.chart2.Margin = new System.Windows.Forms.Padding(2);
             this.chart2.Name = "chart2";
             series4.ChartArea = "ChartArea1";
             series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.SplineArea;
@@ -407,7 +420,7 @@
             series4.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
             series4.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
             this.chart2.Series.Add(series4);
-            this.chart2.Size = new System.Drawing.Size(303, 311);
+            this.chart2.Size = new System.Drawing.Size(700, 311);
             this.chart2.TabIndex = 1;
             this.chart2.Text = "chart2";
             // 
@@ -428,9 +441,9 @@
             this.groupBox3.Controls.Add(this.label10);
             this.groupBox3.Controls.Add(this.label9);
             this.groupBox3.Location = new System.Drawing.Point(8, 15);
-            this.groupBox3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox3.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox3.Padding = new System.Windows.Forms.Padding(2);
             this.groupBox3.Size = new System.Drawing.Size(274, 311);
             this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
@@ -580,9 +593,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(600, 366);
+            this.ClientSize = new System.Drawing.Size(1000, 500);
             this.Controls.Add(this.tabControl1);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Form1";
             this.Text = "BackTester";
             this.tabControl1.ResumeLayout(false);
@@ -649,6 +662,7 @@
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.Label label23;
         private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
 
