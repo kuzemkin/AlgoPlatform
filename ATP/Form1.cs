@@ -296,7 +296,7 @@ namespace ATP
             try
             {
                 SmartCom.AddBar += AddBars;
-                SmartCom.GetBars(symbol, interval, DateTime.Now.AddMinutes(-2*sma),
+                SmartCom.GetBars(symbol, interval, DateTime.Now.AddMinutes(-sma),
                     //new DateTime(SetDateTime(interval,n).Year, SetDateTime(interval, n).Month, SetDateTime(interval, n).Day, SetDateTime(interval, n).Hour, SetDateTime(interval, n).Minute, SetDateTime(interval, n).Second), 
                     -n);                
                 SmartCom.AddTick += AddTicks;
@@ -393,6 +393,7 @@ namespace ATP
             else
             {
                 chart1.Series[0].Points.AddXY(date, high, low, open, close);
+                chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1]) - (Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[0]) - chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])));
             }
             Strategy1(BarsList, TradesList);
         }
@@ -416,8 +417,15 @@ namespace ATP
         {            
             if (DateTime.Now.Second == 00 & TicksList.Count > 0 && BarsList.Count>sma)
             {
-                TicksList.Last().Date.AddMinutes(1);
-                AddBars(BarsList.Count - 1, BarsList.Count, symbol, interval, (new DateTime(TicksList.Last().Date.Year, TicksList.Last().Date.Month, TicksList.Last().Date.Day, TicksList.Last().Date.Hour, TicksList.Last().Date.Minute, 00)), TicksList[0].Price, TicksList.Select(n => n.Price).Max(), TicksList.Select(n => n.Price).Min(), TicksList.Last().Price, TicksList.Select(n => n.Volume).Sum(), 0);
+                if(TicksList.Last().Date.Second!=00)
+                {
+                    TicksList.Last().Date.AddMinutes(1);
+                    AddBars(BarsList.Count - 1, BarsList.Count, symbol, interval, (new DateTime(TicksList.Last().Date.Year, TicksList.Last().Date.Month, TicksList.Last().Date.Day, TicksList.Last().Date.Hour, TicksList.Last().Date.Minute, 00)), TicksList[0].Price, TicksList.Select(n => n.Price).Max(), TicksList.Select(n => n.Price).Min(), TicksList.Last().Price, TicksList.Select(n => n.Volume).Sum(), 0);
+                }
+                else
+                {                    
+                    AddBars(BarsList.Count - 1, BarsList.Count, symbol, interval, TicksList.Last().Date, TicksList[0].Price, TicksList.Select(n => n.Price).Max(), TicksList.Select(n => n.Price).Min(), TicksList.Last().Price, TicksList.Select(n => n.Volume).Sum(), 0);
+                }
                 TicksList.Clear();
             }
         }
