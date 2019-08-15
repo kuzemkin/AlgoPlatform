@@ -23,7 +23,7 @@ namespace ATP
         public SmartCOM4Lib.StBarInterval Interval;
         private string Login {get; set;}
         private string Password {get; set;}
-        public string symbol = "Si-9.19_FT";
+        public string symbol = "SBRF-9.19_FT";
         public string Portf = "BP15102-MO-01";
         public StBarInterval interval = StBarInterval.StBarInterval_1Min;
         private static System.Windows.Forms.Timer Timer = new System.Windows.Forms.Timer(); 
@@ -32,9 +32,9 @@ namespace ATP
         public List<Collections.Trade> TradesList = new List<Collections.Trade>();
         public List<Collections.Tick> TicksList = new List<Collections.Tick>();
         public int n = 100;                  //количество запрашиваемых баров 
-        public static int nBars = 12;        //количество баров для отрезка экстремумов
+        public static int nBars = 25;        //количество баров для отрезка экстремумов
         public int ind = nBars;              //начальный индекс  
-        public int sma=24;                //количество баров для скользящей средней  
+        public int sma=50;                //количество баров для скользящей средней  
         public double money;
         public bool isReal=false;          //признак реальных торгов;
         public int orderId = 0;             //идентификатор заявок
@@ -425,35 +425,14 @@ namespace ATP
         /// </summary>
         private void CheckTime(object myobject, EventArgs eventArgs)
         {            
-            if (DateTime.Now.Second == 00 & TicksList.Count > 0 && BarsList.Count>sma)
-            {
-                if(BarsList.Last().Date.Minute==TicksList.Last().Date.Minute)
-                {
-                    if(InvokeRequired)
-                    {
-                        Invoke(new MethodInvoker(delegate
-                        {                            
-                            chart1.Series[0].Points.Last().YValues[3] = TicksList.Last().Price;
-                        }));
-                    }
-                    else
-                    {
-                        chart1.Series[0].Points.Last().YValues[3] = TicksList.Last().Price;
-                    }
-                }
-                else
-                {
-                   if(TicksList.Last().Date.Second!=0)
-                    {
-                        TicksList.Last().Date.AddMinutes(1);
-                        AddBars(BarsList.Count+1 , BarsList.Count, symbol, interval, (new DateTime(TicksList.Last().Date.Year, TicksList.Last().Date.Month, TicksList.Last().Date.Day, TicksList.Last().Date.Hour, TicksList.Last().Date.Minute, 00)), TicksList[0].Price, TicksList.Select(n => n.Price).Max(), TicksList.Select(n => n.Price).Min(), TicksList.Last().Price, TicksList.Select(n => n.Volume).Sum(), 0);
-                    }
-                   else
-                    {
-                         AddBars(BarsList.Count+1, BarsList.Count, symbol, interval, (new DateTime(TicksList.Last().Date.Year, TicksList.Last().Date.Month, TicksList.Last().Date.Day, TicksList.Last().Date.Hour, TicksList.Last().Date.Minute, 00)), TicksList[0].Price, TicksList.Select(n => n.Price).Max(), TicksList.Select(n => n.Price).Min(), TicksList.Last().Price, TicksList.Select(n => n.Volume).Sum(), 0);
-                    }
-                }                
-                TicksList.Clear();
+            if (DateTime.Now.Second == 00 && TicksList.Last().Date > BarsList.Last().Date)
+            {                
+                AddBars(0, 0, symbol, interval, TicksList.Where(p => p.Date > BarsList.Last().Date).Last().Date,
+                    TicksList.Where(p => p.Date > BarsList.Last().Date).Select(p=>p.Price).First(),
+                    TicksList.Where(p => p.Date > BarsList.Last().Date).Select(p=>p.Price).Max(),
+                    TicksList.Where(p => p.Date > BarsList.Last().Date).Select(p => p.Price).Min(),
+                    TicksList.Where(p => p.Date > BarsList.Last().Date).Last().Price,
+                    TicksList.Where(p => p.Date > BarsList.Last().Date).Select(n => n.Volume).Sum(), 10);                
             }
         }
         /// <summary>
@@ -512,7 +491,7 @@ namespace ATP
         {
             if (t.Count() > 0 && t.Last().State != Collections.Trade.OrderState.Active || t.Count() == 0)
             {
-                t.Add(new Collections.Trade(b[i + 1].Date, b[i + 1].Open, Collections.Trade.OrderType.Buy, AmountCalculation(money, BarsList)));                
+                t.Add(new Collections.Trade(b[i].Date, b[i].Close, Collections.Trade.OrderType.Buy, AmountCalculation(money, BarsList)));                
                 //выставляем ордер на биржу
                 if (isReal==true)
                 {
@@ -524,21 +503,21 @@ namespace ATP
                     Invoke(new MethodInvoker(delegate
                     {
                         label10.Text = t.Count().ToString();
-                        chart1.Series[1].Points.AddXY(b[i + 1].Date, b[i + 1].Open);
+                        chart1.Series[1].Points.AddXY(b[i].Date, b[i].Close);
                         chart1.Series.Add(b[i].Date.ToString());
                         chart1.Series.Last().ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
                         chart1.Series.Last().Color = System.Drawing.Color.Blue;
-                        chart1.Series.Last().Points.AddXY(b[i + 1].Date, b[i + 1].Open);
+                        chart1.Series.Last().Points.AddXY(b[i].Date, b[i].Close);
                     }));
                 }
                 else
                 {
                     label10.Text = t.Count().ToString();
-                    chart1.Series[1].Points.AddXY(b[i + 1].Date, b[i + 1].Open);
+                    chart1.Series[1].Points.AddXY(b[i].Date, b[i].Close);
                     chart1.Series.Add(b[i].Date.ToString());
                     chart1.Series.Last().ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
                     chart1.Series.Last().Color = System.Drawing.Color.Blue;
-                    chart1.Series.Last().Points.AddXY(b[i + 1].Date, b[i + 1].Open);
+                    chart1.Series.Last().Points.AddXY(b[i].Date, b[i].Close);
                 }
                 ind = b.FindLastIndex(p => p.Date == t.Last().OpenDate);
             }
@@ -559,8 +538,8 @@ namespace ATP
                     SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Sell, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, t.Last().Amount, 0, orderId);
                     orderId++;
                 }
-                t.Last().ClosePrice = b[i + 1].Open;
-                t.Last().CloseDate = b[i + 1].Date;
+                t.Last().ClosePrice = b[i].Close;
+                t.Last().CloseDate = b[i].Date;
                 t.Last().Result = t.Last().ClosePrice - t.Last().OpenPrice;
                 t.Last().State = Collections.Trade.OrderState.Close;
                 t.Last().Span = t.Last().CloseDate - t.Last().OpenDate;
@@ -702,6 +681,8 @@ namespace ATP
                 case "MGNT":
                     return Math.Round(cash / b.Last().Close * 1 / 2);
                 case "Si-9.19_FT":
+                    return 1;
+                case "SBRF-9.19_FT":
                     return 1;
                 default:
                     return Math.Round(cash / b.Last().Close * 10 / 2);

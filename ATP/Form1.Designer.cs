@@ -331,7 +331,7 @@
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(76, 20);
             this.textBox3.TabIndex = 2;
-            this.textBox3.Text = "Si-9.19_FT";
+            this.textBox3.Text = "SBRF-9.19_FT";
             this.textBox3.Click += new System.EventHandler(this.textBox3_Click);
             this.textBox3.LostFocus += new System.EventHandler(this.LostFocus3_Method);
             // 
