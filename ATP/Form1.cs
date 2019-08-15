@@ -424,16 +424,18 @@ namespace ATP
         /// Метод проверки времени
         /// </summary>
         private void CheckTime(object myobject, EventArgs eventArgs)
-        {            
-            if (DateTime.Now.Second == 00 && TicksList.Last().Date > BarsList.Last().Date)
-            {                
-                AddBars(0, 0, symbol, interval, TicksList.Where(p => p.Date > BarsList.Last().Date).Last().Date,
-                    TicksList.Where(p => p.Date > BarsList.Last().Date).Select(p=>p.Price).First(),
-                    TicksList.Where(p => p.Date > BarsList.Last().Date).Select(p=>p.Price).Max(),
-                    TicksList.Where(p => p.Date > BarsList.Last().Date).Select(p => p.Price).Min(),
-                    TicksList.Where(p => p.Date > BarsList.Last().Date).Last().Price,
-                    TicksList.Where(p => p.Date > BarsList.Last().Date).Select(n => n.Volume).Sum(), 10);                
-            }
+        {   if (TicksList.Any())
+            {
+                if (DateTime.Now.Second == 00 && TicksList.Last().Date > BarsList.Last().Date)
+                {
+                    AddBars(0, 0, symbol, interval, TicksList.Where(p => p.Date > BarsList.Last().Date).Last().Date,
+                        TicksList.Where(p => p.Date > BarsList.Last().Date).Select(p => p.Price).First(),
+                        TicksList.Where(p => p.Date > BarsList.Last().Date).Select(p => p.Price).Max(),
+                        TicksList.Where(p => p.Date > BarsList.Last().Date).Select(p => p.Price).Min(),
+                        TicksList.Where(p => p.Date > BarsList.Last().Date).Last().Price,
+                        TicksList.Where(p => p.Date > BarsList.Last().Date).Select(n => n.Volume).Sum(), 10);
+                }
+            }            
         }
         /// <summary>
         /// Метод создания трейда при соблюдении условий
