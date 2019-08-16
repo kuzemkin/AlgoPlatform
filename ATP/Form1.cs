@@ -497,7 +497,14 @@ namespace ATP
                 //выставляем ордер на биржу
                 if (isReal==true)
                 {
-                    SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Buy, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, t.Last().Amount , 0, orderId);
+                    try
+                    {
+                        SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Buy, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, t.Last().Amount, 0, orderId);
+                    }
+                    catch (Exception ex)
+                    {
+                        label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
+                    }                    
                     orderId++;
                 }
                 if (InvokeRequired)
@@ -532,13 +539,12 @@ namespace ATP
         /// <param name="i"></param>
         public void StopBuy(List<Collections.Bar> b, List<Collections.Trade> t, int i)
         {
-            if (t.Last().State != Collections.Trade.OrderState.Close)
-            {                
+            if (t.Any() && t.Last().State != Collections.Trade.OrderState.Close)
+            {
                 //выставляем ордер на биржу
                 if (isReal == true)
-                {
+                {                    
                     SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Sell, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, t.Last().Amount, 0, orderId);
-                    orderId++;
                 }
                 t.Last().ClosePrice = b[i].Close;
                 t.Last().CloseDate = b[i].Date;
