@@ -32,9 +32,9 @@ namespace ATP
         public List<Collections.Tick> TicksList = new List<Collections.Tick>();
         public List<double> SDeviation = new List<double>();
         public int n = 100;                  //количество запрашиваемых баров 
-        public static int nBars = 25;        //количество баров для отрезка экстремумов
+        public static int nBars = 100;        //количество баров для отрезка экстремумов
         public int ind = nBars;              //начальный индекс  
-        public int sma=50;                //количество баров для скользящей средней  
+        public int sma=200;                //количество баров для скользящей средней  
         public double money;
         /// <summary>
         /// Инициалезация компонентов
@@ -279,15 +279,20 @@ namespace ATP
         private void button2_Click(object sender, EventArgs e)
         {
             //сбрасываем коллекции к начальному значению
-            ind = nBars;
-            SmartCom.AddBar -= AddBars;
-            SmartCom.CancelTicks(symbol);
-            BarsList.Clear();
-            TradesList.Clear();
-            ClearSeriesMethod(chart1);
-            ClearMethod(chart1.Series);
-            ClearMethod(chart2.Series);
-            chart1.ChartAreas[0].AxisY.Minimum = 0;
+            try
+            {
+                ind = nBars;
+                SmartCom.AddBar -= AddBars;
+                SmartCom.CancelTicks(symbol);
+                BarsList.Clear();
+                TradesList.Clear();
+                ClearSeriesMethod(chart1);
+                ClearMethod(chart1.Series);
+                ClearMethod(chart2.Series);
+                chart1.ChartAreas[0].AxisY.Minimum = 0;
+            }
+            catch { label3.Text = $"[{DateTime.Now}]: Возникла ошибка!"; }
+
             //получаем бары
             try
             {
@@ -426,9 +431,9 @@ namespace ATP
             if (t.Count>0 && t.Last().State==Collections.Trade.OrderState.Active)
             {
                 //условия выхода
-                for (int l=ind-nBars, i = ind+1; i+1 < b.Count(); i++, l++)
+                for (int l=ind-nBars/2, i = ind+1; i+1 < b.Count(); i++, l++)
                 {
-                    if (b[i].Close < b.GetRange(l, nBars).Select(p => p.Low).Min())
+                    if (b[i].Close < b.GetRange(l, nBars/2).Select(p => p.Low).Min())
                     {
                         StopBuy(b, t, i);
                     }
@@ -444,9 +449,9 @@ namespace ATP
                         SDeviation.Add(b.GetRange(l, nBars).Select(p => p.Close).Max() - b.GetRange(l, nBars).Select(p => p.Close).Min());
                         if (i > sma)
                         {
-                            if (b[i].Close> b.GetRange(l, nBars).Select(p => p.High).Max() & b[i].Median> SMA(b.GetRange(i - sma, sma), sma) & SDeviation.Last()>(SDeviation.GetRange(SDeviation.Count()-sma,sma).Average() + SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - sma, sma))))
+                            if (b[i].Close> b.GetRange(l, nBars).Select(p => p.High).Max() & b[i].Close> SMA(b.GetRange(i - sma, sma), sma) & SDeviation.Last()>(SDeviation.GetRange(SDeviation.Count()-nBars,nBars).Average() + 3*SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars))))
                             {
-                                BuyOrder(b, t, i); MessageBox.Show(SDeviationCalculate(SDeviation.GetRange(SDeviation.Count()-sma,sma)).ToString()+"+"+SDeviation.Last().ToString());             
+                                BuyOrder(b, t, i);             
                             }
                         }
                     }
