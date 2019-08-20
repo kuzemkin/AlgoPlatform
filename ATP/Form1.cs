@@ -32,7 +32,7 @@ namespace ATP
         public List<Collections.Tick> TicksList = new List<Collections.Tick>();
         public List<double> SDeviation = new List<double>();
         public int n = 100;                  //количество запрашиваемых баров 
-        public static int nBars = 100;        //количество баров для отрезка экстремумов
+        public static int nBars = 50;        //количество баров для отрезка экстремумов
         public int ind = nBars;              //начальный индекс  
         public int sma=200;                //количество баров для скользящей средней  
         public double money;
@@ -449,7 +449,7 @@ namespace ATP
                         SDeviation.Add(b.GetRange(l, nBars).Select(p => p.Close).Max() - b.GetRange(l, nBars).Select(p => p.Close).Min());
                         if (i > sma)
                         {
-                            if (b[i].Close> b.GetRange(l, nBars).Select(p => p.High).Max() & b[i].Close> SMA(b.GetRange(i - sma, sma), sma) & SDeviation.Last()>(SDeviation.GetRange(SDeviation.Count()-nBars,nBars).Average() + 3*SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars))))
+                            if (b[i-1].Close< b.GetRange(l, nBars).Select(p => p.Low).Min() & b[i-1].Close> SMA(b.GetRange(i - sma, sma), sma) & b[i].Close>b[i-1].High /*& SDeviation.Last()>(SDeviation.GetRange(SDeviation.Count()-nBars,nBars).Average()  + SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars))*/)
                             {
                                 BuyOrder(b, t, i);             
                             }
