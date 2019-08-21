@@ -449,7 +449,7 @@ namespace ATP
                         SDeviation.Add(b.GetRange(l, nBars).Select(p => p.Close).Max() - b.GetRange(l, nBars).Select(p => p.Close).Min());
                         if (i > sma)
                         {
-                            if (b[i].Close> b.GetRange(l, nBars).Select(p => p.High).Max() & b[i].Close> SMA(b.GetRange(i - sma, sma), sma) & SDeviation.Last()>(SDeviation.GetRange(SDeviation.Count()-nBars,nBars).Average() + SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars))))
+                            if (b[i].Close> b.GetRange(l, nBars).Select(p => p.High).Max() & b[i].Median> SMA(b.GetRange(i - sma, sma), sma) & SDeviation.Last()>(SDeviation.GetRange(SDeviation.Count()-nBars,nBars).Average() + SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars))))
                             {
                                 BuyOrder(b, t, i);             
                             }
