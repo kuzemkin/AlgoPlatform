@@ -31,6 +31,7 @@ namespace ATP
         public List<Collections.Portfolio> PortfList = new List<Collections.Portfolio>();
         public List<Collections.Trade> TradesList = new List<Collections.Trade>();
         public List<Collections.Tick> TicksList = new List<Collections.Tick>();
+        public List<double> SDeviation = new List<double>();
         public int n = 100;                  //количество запрашиваемых баров 
         public static int nBars = 25;        //количество баров для отрезка экстремумов
         public int ind = nBars;              //начальный индекс  
