@@ -721,6 +721,19 @@ namespace ATP
                 isReal = false;
             }
         }
-
+        /// <summary>
+        /// Метод расчета квадратичного отклонения
+        /// </summary>
+        /// <param name="deviation"></param>
+        /// <returns></returns>
+        private double SDeviationCalculate(List<double> deviation)
+        {
+            double sum = 0;
+            for (int i = 0; i < deviation.Count(); i++)
+            {
+                sum += Math.Pow((deviation[i] - deviation.Average()), 2);
+            }
+            return Math.Sqrt(sum / deviation.Count());
+        }
     }
 }
