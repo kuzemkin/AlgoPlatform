@@ -33,9 +33,9 @@ namespace ATP
         public List<Collections.Tick> TicksList = new List<Collections.Tick>();
         public List<double> SDeviation = new List<double>();
         public int n = 100;                  //количество запрашиваемых баров 
-        public static int nBars = 25;        //количество баров для отрезка экстремумов
+        public static int nBars = 50;        //количество баров для отрезка экстремумов
         public int ind = nBars;              //начальный индекс  
-        public int sma=50;                //количество баров для скользящей средней  
+        public int sma=100;                //количество баров для скользящей средней  
         public double money;
         public bool isReal=false;          //признак реальных торгов;
         public int orderId = 0;             //идентификатор заявок
@@ -473,7 +473,7 @@ namespace ATP
                         SDeviation.Add(b.GetRange(l, nBars).Select(p => p.Close).Max() - b.GetRange(l, nBars).Select(p => p.Close).Min());
                         if (i > sma)
                         {
-                            if (b[i].Close> b.GetRange(l, nBars).Select(p => p.High).Max() & b[i].Median> SMA(b.GetRange(i - sma, sma), sma))
+                            if (b[i].Close> b.GetRange(l, nBars).Select(p => p.High).Max() & b[i].Median> SMA(b.GetRange(i - sma, sma), sma) & SDeviation.Last()>SDeviation.GetRange(SDeviation.Count()-nBars, nBars).Average()+SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
                             {
                                 BuyOrder(b, t, i);              
                             }
