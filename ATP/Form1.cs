@@ -431,9 +431,9 @@ namespace ATP
             if (t.Count>0 && t.Last().State==Collections.Trade.OrderState.Active)
             {
                 //условия выхода
-                for (int l=ind-nBars/2, i = ind+1; i+1 < b.Count(); i++, l++)
+                for (int l=ind-nBars/3, i = ind+1; i+1 < b.Count(); i++, l++)
                 {
-                    if (b[i].Close < b.GetRange(l, nBars/2).Select(p => p.Low).Min())
+                    if (b[i].Close < b.GetRange(l, nBars/3).Select(p => p.Low).Min())
                     {
                         StopBuy(b, t, i);
                     }
@@ -449,7 +449,10 @@ namespace ATP
                         SDeviation.Add(b.GetRange(l, nBars).Select(p => p.Close).Max() - b.GetRange(l, nBars).Select(p => p.Close).Min());
                         if (i > sma)
                         {
-                            if (b[i].Close> b.GetRange(l, nBars).Select(p => p.High).Max() & b[i].Median> SMA(b.GetRange(i - sma, sma), sma) & SDeviation.Last()>(SDeviation.GetRange(SDeviation.Count()-nBars,nBars).Average() + SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars))))
+                            if (b[i].Close> b.GetRange(l, nBars).Select(p => p.High).Max() 
+                                & b[i].Median> SMA(b.GetRange(i - sma, sma), sma) 
+                                & SDeviation.Last()<(SDeviation.GetRange(SDeviation.Count()-nBars,nBars).Average() - SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
+                                & BarsCalculation(b.GetRange(l,nBars))>1.2)
                             {
                                 BuyOrder(b, t, i);             
                             }
@@ -639,14 +642,21 @@ namespace ATP
             }            
             return Math.Sqrt(sum/deviation.Count());
         }
+        /// <summary>
+        /// Метод рассчитывает отношение растущих баров к падающим
+        /// </summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
         private double BarsCalculation(List<Collections.Bar> b)
         {
+            double sumA = 0;
+            double sumB = 0;
             for (int i = 0; i < b.Count; i++)
-            {
-                double sumA = 0;
-                if (b[i].Close - b[i].Open >{ sumA+=
+            {                
+                if (b[i].Close - b[i].Open > 0) { sumA ++; }
+                else { sumB++; }
             }
-            return 
+            return sumA / sumB;
         }
     }
 }
