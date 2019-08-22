@@ -639,5 +639,14 @@ namespace ATP
             }            
             return Math.Sqrt(sum/deviation.Count());
         }
+        private double BarsCalculation(List<Collections.Bar> b)
+        {
+            for (int i = 0; i < b.Count; i++)
+            {
+                double sumA = 0;
+                if (b[i].Close - b[i].Open >{ sumA+=
+            }
+            return 
+        }
     }
 }
