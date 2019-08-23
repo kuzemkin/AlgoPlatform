@@ -32,9 +32,9 @@ namespace ATP
         public List<Collections.Tick> TicksList = new List<Collections.Tick>();
         public List<double> SDeviation = new List<double>();
         public int n = 100;                  //количество запрашиваемых баров 
-        public static int nBars = 100;        //количество баров для отрезка экстремумов
+        public static int nBars = 50;        //количество баров для отрезка экстремумов
         public int ind = nBars;              //начальный индекс  
-        public int sma=200;                //количество баров для скользящей средней  
+        public int sma=100;                //количество баров для скользящей средней  
         public double money;
         /// <summary>
         /// Инициалезация компонентов
@@ -431,9 +431,9 @@ namespace ATP
             if (t.Count>0 && t.Last().State==Collections.Trade.OrderState.Active)
             {
                 //условия выхода
-                for (int l=ind-nBars/4, i = ind+1; i+1 < b.Count(); i++, l++)
+                for (int l=ind-nBars, i = ind+1; i+1 < b.Count(); i++, l++)
                 {
-                    if (b[i].Close < b.GetRange(l, nBars/4).Select(p => p.Low).Min())
+                    if (b[i].Close < b.GetRange(l, nBars).Select(p => p.Low).Min())
                     {
                         StopBuy(b, t, i);
                     }
