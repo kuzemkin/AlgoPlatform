@@ -473,8 +473,11 @@ namespace ATP
                         SDeviation.Add(b.GetRange(l, nBars).Select(p => p.Close).Max() - b.GetRange(l, nBars).Select(p => p.Close).Min());
                         if (i > sma)
                         {
-                            if (b[i].Close> b.GetRange(l, nBars).Select(p => p.High).Max() & b[i].Median> SMA(b.GetRange(i - sma, sma), sma) & SDeviation.Last()>SDeviation.GetRange(SDeviation.Count()-nBars, nBars).Average()+SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
-                            {
+                            if (b[i].Close > b.GetRange(l, nBars).Select(p => p.High).Max()
+                                & b[i].Median > SMA(b.GetRange(i - sma, sma), sma)
+                                & SDeviation.Last() > (SDeviation.GetRange(SDeviation.Count() - nBars, nBars).Average() + 2 * SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
+                                & BarsCalculation(b.GetRange(l - nBars, nBars)) < 1)
+                            { 
                                 BuyOrder(b, t, i);              
                             }
                         }
@@ -734,6 +737,22 @@ namespace ATP
                 sum += Math.Pow((deviation[i] - deviation.Average()), 2);
             }
             return Math.Sqrt(sum / deviation.Count());
+        }
+        /// <summary>
+        /// Метод рассчитывает отношение растущих баров к падающим
+        /// </summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        private double BarsCalculation(List<Collections.Bar> b)
+        {
+            double sumA = 0;
+            double sumB = 0;
+            for (int i = 0; i < b.Count; i++)
+            {
+                if (b[i].Close > b[i].Open) { sumA += b[i].Close - b[i].Open; }
+                else { sumB += b[i].Open - b[i].Close; }
+            }
+            return sumA / sumB;
         }
     }
 }
