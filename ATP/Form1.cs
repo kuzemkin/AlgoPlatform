@@ -34,7 +34,7 @@ namespace ATP
         public int n = 100;                  //количество запрашиваемых баров 
         public static int nBars = 50;        //количество баров для отрезка экстремумов
         public int ind = nBars;              //начальный индекс  
-        public int sma=100;                //количество баров для скользящей средней  
+        public int sma=200;                //количество баров для скользящей средней  
         public double money;
         /// <summary>
         /// Инициалезация компонентов
@@ -431,9 +431,9 @@ namespace ATP
             if (t.Count>0 && t.Last().State==Collections.Trade.OrderState.Active)
             {
                 //условия выхода
-                for (int l=ind-nBars, i = ind+1; i+1 < b.Count(); i++, l++)
+                for (int l=ind-nBars/2, i = ind+1; i+1 < b.Count(); i++, l++)
                 {
-                    if (b[i].Close < b.GetRange(l, nBars).Select(p => p.Low).Min())
+                    if (b[i].Close < b.GetRange(l, nBars/2).Select(p => p.Low).Min())
                     {
                         StopBuy(b, t, i);
                     }
@@ -451,9 +451,10 @@ namespace ATP
                         {
                             if (b[i].Close> b.GetRange(l, nBars).Select(p => p.High).Max() 
                                 & b[i].Median> SMA(b.GetRange(i - sma, sma), sma) 
-                                & SDeviation.Last()>(SDeviation.GetRange(SDeviation.Count()-nBars,nBars).AsParallel().Average() + 2*SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
-                                & SDeviation.GetRange(SDeviation.Count() - 2*nBars, nBars).AsParallel().Average()< SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average()
-                                & BarsCalculation(b.GetRange(l-nBars, nBars))<1)
+                                & SDeviation.Last()<(SDeviation.GetRange(SDeviation.Count()-nBars,nBars).AsParallel().Average() - SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
+                                & SDeviation.GetRange(SDeviation.Count() - 2*nBars, nBars).AsParallel().Average()> SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average()
+                                & BarsCalculation(b.GetRange(l-nBars, nBars))<1
+                                )
                             {
                                 BuyOrder(b, t, i);             
                             }
