@@ -34,7 +34,7 @@ namespace ATP
         public int n = 100;                  //количество запрашиваемых баров 
         public static int nBars = 50;        //количество баров для отрезка экстремумов
         public int ind = nBars;              //начальный индекс  
-        public int sma=100;                //количество баров для скользящей средней  
+        public int sma=200;                //количество баров для скользящей средней  
         public double money;
         /// <summary>
         /// Инициалезация компонентов
@@ -449,11 +449,10 @@ namespace ATP
                         SDeviation.Add(b.GetRange(l, nBars).Select(p => p.Close).Max() - b.GetRange(l, nBars).Select(p => p.Close).Min());
                         if (i > sma)
                         {
-                            if (b[i].Close> b.GetRange(l, nBars).Select(p => p.High).Max() 
-                                & b.GetRange(i-nBars,nBars).Select(p=>p.Median).Average() > SMA(b.GetRange(i - sma, sma), sma) 
-                                & SDeviation.Last()<(SDeviation.GetRange(SDeviation.Count()-nBars,nBars).AsParallel().Average() - SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
-                               // & SDeviation.GetRange(SDeviation.Count() - 2*nBars, nBars).AsParallel().Average()> SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average()
-                                & BarsCalculation(b.GetRange(l-nBars, nBars))<1
+                            if (b[i].Close> b.GetRange(l, nBars).Select(p => p.High).Max()
+                                & b.GetRange(i - nBars, nBars).Select(p => p.Median).Average() > SMA(b.GetRange(i - sma, sma), sma)
+                                & SDeviation.Last() < (SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() - SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
+                                & BarsCalculation(b.GetRange(l - nBars, nBars)) < 1
                                 )
                             {
                                 BuyOrder(b, t, i);             
