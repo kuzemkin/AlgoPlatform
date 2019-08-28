@@ -450,10 +450,8 @@ namespace ATP
                         if (i > sma)
                         {
                             if (b[i].Close> b.GetRange(l, nBars).Select(p => p.High).Max()
-                                ///& b.GetRange(i - nBars, nBars).Select(p => p.Median).Average() > SMA(b.GetRange(i - sma, sma), sma)
-                                & SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() > (SDeviation.GetRange(SDeviation.Count() - 2*nBars, nBars).AsParallel().Average() + SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - 2*nBars, nBars)))
-                                //& SDeviation.Last() > SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() 
-                                & BarsCalculation(b.GetRange(l - 2*nBars, nBars)) > 1
+                                & SDeviation.Last() < (SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() - SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
+                                & BarsCalculation(b.GetRange(l - nBars, nBars)) < 1                                
                                 )
                             {
                                 BuyOrder(b, t, i);             
