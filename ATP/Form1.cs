@@ -33,9 +33,9 @@ namespace ATP
         public List<Collections.Tick> TicksList = new List<Collections.Tick>();
         public List<double> SDeviation = new List<double>();
         public int n = 100;                  //количество запрашиваемых баров 
-        public static int nBars = 50;        //количество баров для отрезка экстремумов
+        public static int nBars = 25;        //количество баров для отрезка экстремумов
         public int ind = nBars;              //начальный индекс  
-        public int sma=100;                //количество баров для скользящей средней  
+        public int sma=50;                //количество баров для скользящей средней  
         public double money;
         public bool isReal=false;          //признак реальных торгов;
         public int orderId = 0;             //идентификатор заявок
@@ -126,11 +126,11 @@ namespace ATP
         /// Метод отображает статус соединения с сервером
         /// </summary>
         /// <param name="st"></param>
-        private void DisConStatus(string st= "Отключение по инициативе клиента")
+        private void DisConStatus(string st)
         {
             if (InvokeRequired)
             {
-                BeginInvoke(new MethodInvoker(delegate { label3.Text = $"[{DateTime.Now}]: Соединение разорвано"; button1.Text = "Подключиться"; }));
+                BeginInvoke(new MethodInvoker(delegate { label3.Text = $"[{DateTime.Now}]: {st}"; button1.Text = "Подключиться"; }));
             }
         }
         /// <summary>
@@ -474,9 +474,10 @@ namespace ATP
                         if (i > sma)
                         {
                             if (b[i].Close > b.GetRange(l, nBars).Select(p => p.High).Max()
-                                & SDeviation.Last() < (SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() - SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
+                                & b[i].Median > SMA(b.GetRange(i - sma, sma), sma)
+                                & SDeviation.Last() > (SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() + 2 * SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
                                 & BarsCalculation(b.GetRange(l - nBars, nBars)) < 1
-                                )
+                                )                                
                             { 
                                 BuyOrder(b, t, i);              
                             }
