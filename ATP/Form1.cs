@@ -455,9 +455,9 @@ namespace ATP
             if (t.Count>0 && t.Last().State==Collections.Trade.OrderState.Active)
             {
                 //условия выхода
-                for (int l=ind-nBars, i = ind+1; i+1 < b.Count(); i++, l++)
+                for (int l=ind-nBars/2, i = ind+1; i+1 < b.Count(); i++, l++)
                 {
-                    if (b[i].Close < b.GetRange(l, nBars).Select(p => p.Low).Min())
+                    if (b[i].Close < b.GetRange(l, nBars/2).Select(p => p.Low).Min())
                     {
                         StopBuy(b, t, i);
                     }
@@ -474,9 +474,9 @@ namespace ATP
                         if (i > sma)
                         {
                             if (b[i].Close > b.GetRange(l, nBars).Select(p => p.High).Max()
-                                & b[i].Median > SMA(b.GetRange(i - sma, sma), sma)
-                                & SDeviation.Last() > (SDeviation.GetRange(SDeviation.Count() - nBars, nBars).Average() + 2 * SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
-                                & BarsCalculation(b.GetRange(l - nBars, nBars)) < 1)
+                                & SDeviation.Last() < (SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() - SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
+                                & BarsCalculation(b.GetRange(l - nBars, nBars)) < 1
+                                )
                             { 
                                 BuyOrder(b, t, i);              
                             }
