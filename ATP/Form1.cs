@@ -458,8 +458,27 @@ namespace ATP
                 for (int l=ind-nBars/2, i = ind+1; i+1 < b.Count(); i++, l++)
                 {
                     if (b[i].Close < b.GetRange(l, nBars/2).Select(p => p.Low).Min())
-                    {
-                        StopBuy(b, t, i);
+                    {                        
+                        if (SmartCom.IsConnected())
+                        {
+                            StopBuy(b, t, i);
+                        }
+                        else
+                        {
+                            while (SmartCom.IsConnected() == false)
+                            {
+                                try
+                                {
+                                    SmartCom.connect("mx2.ittrade.ru", 8443, Login, Password);
+                                }
+                                catch (Exception ex)
+                                {
+                                    label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
+                                }
+                                Thread.Sleep(3000);
+                            }
+                            StopBuy(b, t, i);
+                        }
                     }
                 }
             }
@@ -479,7 +498,27 @@ namespace ATP
                                //& BarsCalculation(b.GetRange(l - nBars, nBars)) < 1
                                 )                                
                             { 
-                                BuyOrder(b, t, i);              
+                                if(SmartCom.IsConnected())
+                                {
+                                    BuyOrder(b, t, i);
+                                }
+                                else
+                                {
+                                    while(SmartCom.IsConnected()==false)
+                                    {
+                                        try
+                                        {
+                                            SmartCom.connect("mx2.ittrade.ru", 8443, Login, Password);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
+                                        }
+                                        Thread.Sleep(3000);
+                                    }
+                                    BuyOrder(b, t, i);
+                                }
+                                                                          
                             }
                         }
                     }
