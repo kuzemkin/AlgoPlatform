@@ -431,9 +431,10 @@ namespace ATP
             if (t.Count>0 && t.Last().State==Collections.Trade.OrderState.Active)
             {
                 //условия выхода
-                for (int l=ind-nBars/2, i = ind+1; i+1 < b.Count(); i++, l++)
+                for (int l=ind-nBars, i = ind+1; i+1 < b.Count(); i++, l++)
                 {
-                    if (b[i].Close < b.GetRange(l, nBars/2).Select(p => p.Low).Min())
+                    SDeviation.Add(b.GetRange(l, nBars).Select(p => p.Close).Max() - b.GetRange(l, nBars).Select(p => p.Close).Min());
+                    if (b[i].Close < (b.GetRange(l, nBars).Select(p => p.High).Max())-(SDeviation.Last()/2))
                     {
                         StopBuy(b, t, i);
                     }
