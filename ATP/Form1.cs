@@ -431,10 +431,10 @@ namespace ATP
             if (t.Count>0 && t.Last().State==Collections.Trade.OrderState.Active)
             {
                 //условия выхода
-                for (int l=ind-nBars, i = ind+1; i+1 < b.Count(); i++, l++)
+                for (int i = ind+1; i < b.Count(); i++)
                 {
                     SDeviation.Add(b.GetRange(i-nBars, nBars).Select(p => p.Close).Max() - b.GetRange(i-nBars, nBars).Select(p => p.Close).Min());
-                    if (b[i].Close < (b.GetRange(i-1-nBars, nBars).Select(p => p.High).Max())-(SDeviation.Last()/2))
+                    if (b[i].Close < (b.GetRange(i-1-nBars, nBars).Select(p => p.High).Max())-(SDeviation.Last()))
                     {
                         StopBuy(b, t, i);
                     }
@@ -445,7 +445,7 @@ namespace ATP
                 if (b.Count > sma)
                 {
                     //условия входа
-                    for (int l = ind - nBars, i = ind + 1; i + 1 < b.Count(); i++, l++)
+                    for (int i = ind + 1; i < b.Count(); i++)
                     {
                         SDeviation.Add(b.GetRange(i-nBars, nBars).Select(p => p.Close).Max() - b.GetRange(i-nBars, nBars).Select(p => p.Close).Min());
                         if (i > sma)
@@ -483,7 +483,7 @@ namespace ATP
         {
             if (t.Count() > 0 && t.Last().State != Collections.Trade.OrderState.Active || t.Count() == 0)
             {
-                t.Add(new Collections.Trade(b[i + 1].Date, b[i + 1].Open, Collections.Trade.OrderType.Buy, AmountCalculation(money, BarsList)));                
+                t.Add(new Collections.Trade(b[i].Date, b[i].Close, Collections.Trade.OrderType.Buy, AmountCalculation(money, BarsList)));                
                 //выставляем ордер на биржу
                 if (b[i].Date==DateTime.Today)
                 {
@@ -494,11 +494,11 @@ namespace ATP
                     Invoke(new MethodInvoker(delegate
                     {
                         label10.Text = t.Count().ToString();
-                        chart1.Series[1].Points.AddXY(b[i + 1].Date, b[i + 1].Open);
+                        chart1.Series[1].Points.AddXY(b[i].Date, b[i].Close);
                         chart1.Series.Add(b[i].Date.ToString());
                         chart1.Series.Last().ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
                         chart1.Series.Last().Color = System.Drawing.Color.Blue;
-                        chart1.Series.Last().Points.AddXY(b[i + 1].Date, b[i + 1].Open);
+                        chart1.Series.Last().Points.AddXY(b[i].Date, b[i].Close);
                     }));
                 }
                 ind = b.FindLastIndex(p => p.Date == t.Last().OpenDate);
@@ -519,8 +519,8 @@ namespace ATP
                 {
                     SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Sell, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, t.Last().Amount, 0, Convert.ToInt32(DateTime.Now.ToBinary()));
                 }
-                t.Last().ClosePrice = b[i + 1].Open;
-                t.Last().CloseDate = b[i + 1].Date;
+                t.Last().ClosePrice = b[i].Close;
+                t.Last().CloseDate = b[i].Date;
                 t.Last().Result = t.Last().ClosePrice - t.Last().OpenPrice;
                 t.Last().State = Collections.Trade.OrderState.Close;
                 t.Last().Span = t.Last().CloseDate - t.Last().OpenDate;
@@ -554,8 +554,8 @@ namespace ATP
                                 label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalMinutes) / t.Count())).ToString();
                                 break;
                         }
-                        chart1.Series[1].Points.AddXY(b[i + 1].Date, b[i + 1].Open);
-                        chart1.Series.Last().Points.AddXY(b[i + 1].Date, b[i + 1].Open);
+                        chart1.Series[1].Points.AddXY(b[i].Date, b[i].Close);
+                        chart1.Series.Last().Points.AddXY(b[i].Date, b[i].Close);
                         chart2.Series[0].Points.AddXY(t.Last().CloseDate, t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(r => r.Result).Sum());
                     }));
                 }
