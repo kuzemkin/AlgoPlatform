@@ -379,7 +379,7 @@ namespace ATP
                     //
                     //ниже представлена инстуркция, регулирующая масштаб графика
                     //
-                    chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1]) - (Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).Min(p => p.YValues[0]) - chart1.Series[0].Points.Where(p => p.YValues[1] > 0).Min(p => p.YValues[1])));
+                    chart1.ChartAreas[0].AxisY.Minimum = chart1.Series[0].Points.Where(p => p.YValues[1] > 0).AsParallel().Min(p => p.YValues[1]) - (Math.Abs(chart1.Series[0].Points.Where(p => p.YValues[0] > 0).AsParallel().Min(p => p.YValues[0]) - chart1.Series[0].Points.Where(p => p.YValues[1] > 0).AsParallel().Min(p => p.YValues[1])));
                     //
                     //добавляем скользящую среднею на график
                     //
@@ -388,7 +388,7 @@ namespace ATP
                         SMACalculation();
                         if (BarsList.Count > sma)
                         {
-                            chart1.Series[2].Points.AddXY(BarsList.Last().Date, ((BarsList.GetRange(BarsList.Count() - sma, sma).Select(p => p.Median).Sum()) / sma));
+                            chart1.Series[2].Points.AddXY(BarsList.Last().Date, ((BarsList.GetRange(BarsList.Count() - sma, sma).AsParallel().Select(p => p.Median).Sum()) / sma));
                         }
                     }
                 }));
@@ -402,7 +402,7 @@ namespace ATP
                     SMACalculation();
                     if (BarsList.Count > sma)
                     {
-                        chart1.Series[2].Points.AddXY(BarsList.Last().Date, ((BarsList.GetRange(BarsList.Count() - sma, sma).Select(p => p.Median).Sum()) / sma));
+                        chart1.Series[2].Points.AddXY(BarsList.Last().Date, ((BarsList.GetRange(BarsList.Count() - sma, sma).AsParallel().Select(p => p.Median).Sum()) / sma));
                     }
                 }
             }
@@ -457,7 +457,7 @@ namespace ATP
                 //условия выхода
                 for (int l=ind-nBars/2, i = ind+1; i+1 < b.Count(); i++, l++)
                 {
-                    if (b[i].Close < b.GetRange(l, nBars/2).Select(p => p.Low).Min())
+                    if (b[i].Close < b.GetRange(l, nBars/2).AsParallel().Select(p => p.Low).Min())
                     {                        
                         if (SmartCom.IsConnected())
                         {
@@ -489,10 +489,10 @@ namespace ATP
                     //условия входа
                     for (int l = ind - nBars, i = ind + 1; i + 1 < b.Count(); i++, l++)
                     {
-                        SDeviation.Add(b.GetRange(l, nBars).Select(p => p.Close).Max() - b.GetRange(l, nBars).Select(p => p.Close).Min());
+                        SDeviation.Add(b.GetRange(l, nBars).AsParallel().Select(p => p.Close).Max() - b.GetRange(l, nBars).Select(p => p.Close).Min());
                         if (i > sma)
                         {
-                            if (b[i].Close > b.GetRange(l, nBars).Select(p => p.High).Max()
+                            if (b[i].Close > b.GetRange(l, nBars).AsParallel().Select(p => p.High).Max()
                                 //& b[i].Median > SMA(b.GetRange(i - sma, sma), sma)
                                 //& SDeviation.Last() > (SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() + 2 * SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
                                //& BarsCalculation(b.GetRange(l - nBars, nBars)) < 1
@@ -633,22 +633,22 @@ namespace ATP
                                 label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalMinutes) / t.Count())).ToString();
                                 break;
                         }
-                        chart1.Series[1].Points.AddXY(b[i + 1].Date, b[i + 1].Open);
-                        chart1.Series.Last().Points.AddXY(b[i + 1].Date, b[i + 1].Open);
-                        chart2.Series[0].Points.AddXY(t.Last().CloseDate, t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(r => r.Result).Sum());
+                        chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);
+                        chart1.Series.Last().Points.AddXY(b[i].Date, b[i].Open);
+                        chart2.Series[0].Points.AddXY(t.Last().CloseDate, t.Where(v => v.State == Collections.Trade.OrderState.Close).AsParallel().Select(r => r.Result).Sum());
                     }));
                 }
                 else
                 {
-                    label12.Text = t.Where(n => n.Result > 0).Select(m => m).Count().ToString();
-                    label14.Text = t.Where(n => n.Result < 0).Select(m => m).Count().ToString();
-                    label16.Text = Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum(), 1).ToString();
-                    label19.Text = Math.Round((t.Where(r => r.Result > 0).Select(s => s.Result).Sum()) / Math.Abs(t.Where(r => r.Result < 0).Select(s => s.Result).Sum()), 2).ToString();
+                    label12.Text = t.Where(n => n.Result > 0).AsParallel().Select(m => m).Count().ToString();
+                    label14.Text = t.Where(n => n.Result < 0).AsParallel().Select(m => m).Count().ToString();
+                    label16.Text = Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).AsParallel().Select(n => n.Result).Sum(), 1).ToString();
+                    label19.Text = Math.Round((t.Where(r => r.Result > 0).AsParallel().Select(s => s.Result).Sum()) / Math.Abs(t.Where(r => r.Result < 0).Select(s => s.Result).Sum()), 2).ToString();
                     label21.Text = Math.Round((b.Last().Close - b[0].Open), 2).ToString();
                     switch (interval)
                     {
                         case StBarInterval.StBarInterval_Day:
-                            label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalDays) / t.Count())).ToString();
+                            label23.Text = Math.Round((t.Select(s => s.Span).AsParallel().Sum(m => m.TotalDays) / t.Count())).ToString();
                             break;
                         case StBarInterval.StBarInterval_Week:
                             label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalDays) / t.Count())).ToString();
@@ -666,9 +666,9 @@ namespace ATP
                             label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalMinutes) / t.Count())).ToString();
                             break;
                     }
-                    chart1.Series[1].Points.AddXY(b[i + 1].Date, b[i + 1].Open);
-                    chart1.Series.Last().Points.AddXY(b[i + 1].Date, b[i + 1].Open);
-                    chart2.Series[0].Points.AddXY(t.Last().CloseDate, t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(r => r.Result).Sum());
+                    chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);
+                    chart1.Series.Last().Points.AddXY(b[i].Date, b[i].Open);
+                    chart2.Series[0].Points.AddXY(t.Last().CloseDate, t.Where(v => v.State == Collections.Trade.OrderState.Close).AsParallel().Select(r => r.Result).Sum());
                 }
                 ind = b.FindLastIndex(p => p.Date == t.Last().CloseDate);
             }
