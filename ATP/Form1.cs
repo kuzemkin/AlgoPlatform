@@ -431,12 +431,12 @@ namespace ATP
                 {
                     try
                     {
-                        AddBars(0, 0, symbol, interval, TicksList.Where(p => p.Date > BarsList.Last().Date).Last().Date,
-                       TicksList.Where(p => p.Date > BarsList.Last().Date).Select(p => p.Price).First(),
-                       TicksList.Where(p => p.Date > BarsList.Last().Date).Select(p => p.Price).Max(),
-                       TicksList.Where(p => p.Date > BarsList.Last().Date).Select(p => p.Price).Min(),
-                       TicksList.Where(p => p.Date > BarsList.Last().Date).Last().Price,
-                       TicksList.Where(p => p.Date > BarsList.Last().Date).Select(n => n.Volume).Sum(), 10);
+                        AddBars(0, 0, symbol, interval, TicksList.Where(p => p.Date > BarsList.Last().Date).AsParallel().Last().Date,
+                       TicksList.Where(p => p.Date > BarsList.Last().Date).AsParallel().Select(p => p.Price).First(),
+                       TicksList.Where(p => p.Date > BarsList.Last().Date).AsParallel().Select(p => p.Price).Max(),
+                       TicksList.Where(p => p.Date > BarsList.Last().Date).AsParallel().Select(p => p.Price).Min(),
+                       TicksList.Where(p => p.Date > BarsList.Last().Date).AsParallel().Last().Price,
+                       TicksList.Where(p => p.Date > BarsList.Last().Date).AsParallel().Select(n => n.Volume).Sum(), 10);
                     }
                     catch(Exception e)
                     {
