@@ -455,9 +455,9 @@ namespace ATP
             if (t.Count>0 && t.Last().State==Collections.Trade.OrderState.Active)
             {
                 //условия выхода
-                for (int l=ind-nBars/2, i = ind+1; i+1 < b.Count(); i++, l++)
+                for (int i = ind+1; i < b.Count(); i++)
                 {
-                    if (b[i].Close < b.GetRange(l, nBars/2).AsParallel().Select(p => p.Low).Min())
+                    if (b[i].Close < b.GetRange(i-1-nBars, nBars/2).AsParallel().Select(p => p.Low).Min())
                     {                        
                         if (SmartCom.IsConnected())
                         {
@@ -465,6 +465,8 @@ namespace ATP
                         }
                         else
                         {
+                            SmartCom.AddTick -= AddTicks;
+                            SmartCom.CancelTicks(symbol);
                             while (SmartCom.IsConnected() == false)
                             {
                                 try
@@ -476,7 +478,9 @@ namespace ATP
                                     label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
                                 }
                                 Thread.Sleep(3000);
-                            }
+                            }                           
+                            SmartCom.ListenTicks(symbol);
+                            SmartCom.AddTick += AddTicks;
                             StopBuy(b, t, i);
                         }
                     }
@@ -487,12 +491,12 @@ namespace ATP
                 if (b.Count > sma)
                 {
                     //условия входа
-                    for (int l = ind - nBars, i = ind + 1; i + 1 < b.Count(); i++, l++)
+                    for (int i = ind + 1; i < b.Count(); i++)
                     {
-                        SDeviation.Add(b.GetRange(l, nBars).AsParallel().Select(p => p.Close).Max() - b.GetRange(l, nBars).Select(p => p.Close).Min());
+                        SDeviation.Add(b.GetRange(i-nBars, nBars).AsParallel().Select(p => p.Close).Max() - b.GetRange(i-nBars, nBars).Select(p => p.Close).Min());
                         if (i > sma)
                         {
-                            if (b[i].Close > b.GetRange(l, nBars).AsParallel().Select(p => p.High).Max()
+                            if (b[i].Close > b.GetRange(i-1-nBars, nBars).AsParallel().Select(p => p.High).Max()
                                 //& b[i].Median > SMA(b.GetRange(i - sma, sma), sma)
                                 //& SDeviation.Last() > (SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() + 2 * SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
                                //& BarsCalculation(b.GetRange(l - nBars, nBars)) < 1
@@ -504,6 +508,8 @@ namespace ATP
                                 }
                                 else
                                 {
+                                    SmartCom.AddTick -= AddTicks;
+                                    SmartCom.CancelTicks(symbol);
                                     while(SmartCom.IsConnected()==false)
                                     {
                                         try
@@ -516,6 +522,8 @@ namespace ATP
                                         }
                                         Thread.Sleep(3000);
                                     }
+                                    SmartCom.ListenTicks(symbol);
+                                    SmartCom.AddTick += AddTicks;
                                     BuyOrder(b, t, i);
                                 }
                                                                           
@@ -743,6 +751,10 @@ namespace ATP
                 case "Si-9.19_FT":
                     return 1;
                 case "SBRF-9.19_FT":
+                    return 1;
+                case "GAZR-9.19_FT":
+                    return 1;
+                case "BR-9.19_FT":
                     return 1;
                 default:
                     return Math.Round(cash / b.Last().Close * 10 / 2);
