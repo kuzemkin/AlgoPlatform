@@ -32,7 +32,7 @@ namespace ATP
         public List<Collections.Tick> TicksList = new List<Collections.Tick>();
         public List<double> SDeviation = new List<double>();
         public int n = 100;                  //количество запрашиваемых баров 
-        public static int nBars = 25;        //количество баров для отрезка экстремумов
+        public static int nBars = 30;        //количество баров для отрезка экстремумов
         public int ind = nBars;              //начальный индекс  
         public int sma=200;                //количество баров для скользящей средней  
         public double money;
@@ -434,7 +434,7 @@ namespace ATP
                 for (int i = ind+1; i < b.Count(); i++)
                 {
                     SDeviation.Add(b.GetRange(i-nBars, nBars).Select(p => p.Close).Max() - b.GetRange(i-nBars, nBars).Select(p => p.Close).Min());
-                    if (b[i].Close < (b.GetRange(i-1-nBars, nBars).Select(p => p.High).Max())-(SDeviation.Last()))
+                    if (b[i].Close < (b.GetRange(i-1-nBars, nBars).Select(p => p.High).Max()) - SDeviation.GetRange(i-nBars, nBars).Average() & b[i].Close< b.GetRange(i - 1 - nBars, nBars).Select(p => p.Low).Min())
                     {
                         StopBuy(b, t, i);
                     }
@@ -451,9 +451,10 @@ namespace ATP
                         if (i > sma)
                         {
                             if (b[i].Close > b.GetRange(i - 1 - nBars, nBars).Select(p => p.High).Max()
-                               & SDeviation.Last() > (SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() + 2*SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
+                               & SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() > (SDeviation.GetRange(SDeviation.Count() - 2*nBars, nBars).AsParallel().Average() + 2* SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() -2*nBars, nBars)))
                                & b.GetRange(i - nBars, nBars).Select(p => p.Low).AsParallel().Min() > b.GetRange(i - 2 * nBars, nBars).Select(p => p.Low).AsParallel().Min()
-                               & b.GetRange(i - 2 * nBars, nBars).Select(p => p.Low).AsParallel().Min() > b.GetRange(i - 3 * nBars, nBars).Select(p => p.Low).AsParallel().Min()
+                              // & b.GetRange(i - 2 * nBars, nBars).Select(p => p.Low).AsParallel().Min() > b.GetRange(i - 3 * nBars, nBars).Select(p => p.Low).AsParallel().Min()
+                              // & b.GetRange(i-nBars, nBars).AsParallel().Select(p=>p.Close).Average() > SMA(b.GetRange(i-sma,sma), sma)
                                )
                             {
                                 BuyOrder(b, t, i);             
