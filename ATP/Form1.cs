@@ -533,9 +533,9 @@ namespace ATP
                     {
                         label12.Text = t.Where(n => n.Result > 0).Select(m => m).Count().ToString();
                         label14.Text = t.Where(n => n.Result < 0).Select(m => m).Count().ToString();
-                        label16.Text = Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum(), 1).ToString();
+                        label16.Text = Math.Round((t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum()*100/t.Last().OpenPrice),2).ToString()+"%";
                         label19.Text = Math.Round((t.Where(r => r.Result > 0).Select(s => s.Result).Sum()) / Math.Abs(t.Where(r => r.Result < 0).Select(s => s.Result).Sum()), 2).ToString();
-                        label21.Text = Math.Round((b.Last().Close - b[0].Open), 2).ToString();
+                        label21.Text = Math.Round(((b.Last().Close - b[0].Open)*100/b.Last().Close), 2).ToString()+"%";
                         switch (interval)
                         {
                             case StBarInterval.StBarInterval_Day:
