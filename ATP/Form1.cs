@@ -434,7 +434,7 @@ namespace ATP
                 for (int i = ind+1; i < b.Count(); i++)
                 {
                     SDeviation.Add(b.GetRange(i-nBars, nBars).Select(p => p.Close).Max() - b.GetRange(i-nBars, nBars).Select(p => p.Close).Min());
-                    if (b[i].Close < (b.GetRange(i-1- sma, sma).Select(p => p.High).Max()) - SDeviation.GetRange(i-sma, sma).Average() & b[i].Close< b.GetRange(i - 1 - nBars/2, nBars/2).Select(p => p.Low).Min())
+                    if (b[i].Close < (b.GetRange(i-1- sma, sma).Select(p => p.High).Max()) - SDeviation.GetRange(i-sma, sma).Average() & b[i].Close< b.GetRange(i - 1 - nBars, nBars).Select(p => p.Low).Min())
                     {
                         StopBuy(b, t, i);
                     }
@@ -450,7 +450,7 @@ namespace ATP
                         SDeviation.Add(b.GetRange(i-nBars, nBars).Select(p => p.Close).Max() - b.GetRange(i-nBars, nBars).Select(p => p.Close).Min());
                         if (i > 2*sma)
                         {
-                            if (b[i].Close > b.GetRange(i - 1 - nBars, nBars).Select(p => p.High).Max()
+                            if (b[i].Close > b.GetRange(i - 1 - sma, sma).Select(p => p.High).Max()
                                //& SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() < (SDeviation.GetRange(SDeviation.Count() - 2*nBars, nBars).AsParallel().Average() - SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - 2*sma, sma)))
                                & SDeviation.Last() > (SDeviation.GetRange(SDeviation.Count() - sma, sma).AsParallel().Average() + SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - sma, sma)))
                                //& b.GetRange(i - sma/2, sma/2).AsParallel().Select(p => p.Low).Min() > b.GetRange(i - sma, sma/2).AsParallel().Select(p => p.Low).Min()
