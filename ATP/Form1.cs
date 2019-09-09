@@ -493,7 +493,7 @@ namespace ATP
                     //условия входа
                     for (int i = ind + 1; i < b.Count(); i++)
                     {
-                        SDeviation.Add(b.GetRange(i-nBars, nBars).AsParallel().Select(p => p.Close).Max() - b.GetRange(i-nBars, nBars).Select(p => p.Close).Min());
+                        SDeviation.Add(b.GetRange(i-nBars, nBars).AsParallel().Select(p => p.Close).Max() - b.GetRange(i-nBars, nBars).AsParallel().Select(p => p.Close).Min());
                         if (i > sma)
                         {
                             if (b[i].Close > b.GetRange(i-1-nBars, nBars).AsParallel().Select(p => p.High).Max()
