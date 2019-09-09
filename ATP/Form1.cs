@@ -458,31 +458,8 @@ namespace ATP
                 for (int i = ind+1; i < b.Count(); i++)
                 {
                     if (b[i].Close < b.GetRange(i-1-nBars, nBars/2).AsParallel().Select(p => p.Low).Min())
-                    {                        
-                        if (SmartCom.IsConnected())
-                        {
-                            StopBuy(b, t, i);
-                        }
-                        else
-                        {
-                            SmartCom.AddTick -= AddTicks;
-                            SmartCom.CancelTicks(symbol);
-                            while (SmartCom.IsConnected() == false)
-                            {
-                                try
-                                {
-                                    SmartCom.connect("mx2.ittrade.ru", 8443, Login, Password);
-                                }
-                                catch (Exception ex)
-                                {
-                                    label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
-                                }
-                                Thread.Sleep(3000);
-                            }                           
-                            SmartCom.ListenTicks(symbol);
-                            SmartCom.AddTick += AddTicks;
-                            StopBuy(b, t, i);
-                        }
+                    {
+                        StopBuy(b, t, i);
                     }
                 }
             }
@@ -493,7 +470,7 @@ namespace ATP
                     //условия входа
                     for (int i = ind + 1; i < b.Count(); i++)
                     {
-                        SDeviation.Add(b.GetRange(i-nBars, nBars).AsParallel().Select(p => p.Close).Max() - b.GetRange(i-nBars, nBars).Select(p => p.Close).Min());
+                        SDeviation.Add(b.GetRange(i-nBars, nBars).AsParallel().Select(p => p.Close).Max() - b.GetRange(i-nBars, nBars).AsParallel().Select(p => p.Close).Min());
                         if (i > sma)
                         {
                             if (b[i].Close > b.GetRange(i-1-nBars, nBars).AsParallel().Select(p => p.High).Max()
@@ -501,32 +478,8 @@ namespace ATP
                                 //& SDeviation.Last() > (SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() + 2 * SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
                                //& BarsCalculation(b.GetRange(l - nBars, nBars)) < 1
                                 )                                
-                            { 
-                                if(SmartCom.IsConnected())
-                                {
-                                    BuyOrder(b, t, i);
-                                }
-                                else
-                                {
-                                    SmartCom.AddTick -= AddTicks;
-                                    SmartCom.CancelTicks(symbol);
-                                    while(SmartCom.IsConnected()==false)
-                                    {
-                                        try
-                                        {
-                                            SmartCom.connect("mx2.ittrade.ru", 8443, Login, Password);
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
-                                        }
-                                        Thread.Sleep(3000);
-                                    }
-                                    SmartCom.ListenTicks(symbol);
-                                    SmartCom.AddTick += AddTicks;
-                                    BuyOrder(b, t, i);
-                                }
-                                                                          
+                            {
+                                BuyOrder(b, t, i);
                             }
                         }
                     }
@@ -553,20 +506,17 @@ namespace ATP
         {
             if (t.Count() > 0 && t.Last().State != Collections.Trade.OrderState.Active || t.Count() == 0)
             {
-                t.Add(new Collections.Trade(b[i].Date, b[i].Close, Collections.Trade.OrderType.Buy, AmountCalculation(money, BarsList)));                
+                t.Add(new Collections.Trade(b[i].Date, b[i].Close, Collections.Trade.OrderType.Buy, AmountCalculation(money, BarsList)));
                 //выставляем ордер на биржу
-                if (isReal==true)
+                try
                 {
-                    try
-                    {
-                        SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Buy, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, t.Last().Amount, 0, orderId);
-                    }
-                    catch (Exception ex)
-                    {
-                        label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
-                    }                    
-                    orderId++;
+                    SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Buy, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, 1, 0, orderId);
                 }
+                catch (Exception ex)
+                {
+                    label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
+                }
+                orderId++;
                 if (InvokeRequired)
                 {
                     Invoke(new MethodInvoker(delegate
@@ -602,10 +552,15 @@ namespace ATP
             if (t.Any() && t.Last().State != Collections.Trade.OrderState.Close)
             {
                 //выставляем ордер на биржу
-                if (isReal == true)
-                {                    
-                    SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Sell, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, t.Last().Amount, 0, orderId);
+                try
+                {
+                    SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Sell, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, 1, 0, orderId);
                 }
+                catch (Exception ex)
+                {
+                    label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
+                }
+                orderId++;
                 t.Last().ClosePrice = b[i].Close;
                 t.Last().CloseDate = b[i].Date;
                 t.Last().Result = t.Last().ClosePrice - t.Last().OpenPrice;
