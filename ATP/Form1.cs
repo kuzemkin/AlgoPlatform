@@ -128,9 +128,19 @@ namespace ATP
         /// <param name="st"></param>
         private void DisConStatus(string st)
         {
+            SmartCom.disconnect();
             if (InvokeRequired)
             {
                 BeginInvoke(new MethodInvoker(delegate { label3.Text = $"[{DateTime.Now}]: {st}"; button1.Text = "Подключиться"; }));
+            }
+            try
+            {
+                label3.Text = $"[{DateTime.Now}]: Выполняется подключение.....";
+                SmartCom.connect("mx2.ittrade.ru", 8443, Login, Password);                
+            }
+            catch (Exception ex)
+            {
+                label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
             }
         }
         /// <summary>
@@ -459,7 +469,10 @@ namespace ATP
                 {
                     if (b[i].Close < b.GetRange(i-1-nBars, nBars/2).AsParallel().Select(p => p.Low).Min())
                     {
-                        StopBuy(b, t, i);
+                        if(SmartCom.IsConnected())
+                        {
+                            StopBuy(b, t, i);
+                        }
                     }
                 }
             }
@@ -478,9 +491,10 @@ namespace ATP
                                 //& SDeviation.Last() > (SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() + 2 * SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
                                //& BarsCalculation(b.GetRange(l - nBars, nBars)) < 1
                                 )                                
-                            {
-                                BuyOrder(b, t, i);
-                            }
+                            if(SmartCom.IsConnected())
+                                {
+                                    BuyOrder(b, t, i);
+                                }
                         }
                     }
                 }
