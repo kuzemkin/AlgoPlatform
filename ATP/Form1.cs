@@ -467,7 +467,7 @@ namespace ATP
                 //условия выхода
                 for (int i = ind+1; i < b.Count(); i++)
                 {
-                    if (b[i].Close < b.GetRange(i-1-nBars, nBars/2).AsParallel().Select(p => p.Low).Min())
+                    if (b[i].Close < b.GetRange(i-1-nBars, nBars/2).AsParallel().AsOrdered().Select(p => p.Low).Min())
                     {
                         if(SmartCom.IsConnected())
                         {
@@ -483,10 +483,10 @@ namespace ATP
                     //условия входа
                     for (int i = ind + 1; i < b.Count(); i++)
                     {
-                        SDeviation.Add(b.GetRange(i-nBars, nBars).AsParallel().Select(p => p.Close).Max() - b.GetRange(i-nBars, nBars).AsParallel().Select(p => p.Close).Min());
+                        SDeviation.Add(b.GetRange(i-nBars, nBars).AsParallel().AsOrdered().Select(p => p.Close).Max() - b.GetRange(i-nBars, nBars).AsParallel().AsOrdered().Select(p => p.Close).Min());
                         if (i > sma)
                         {
-                            if (b[i].Close > b.GetRange(i-1-nBars, nBars).AsParallel().Select(p => p.High).Max()
+                            if (b[i].Close > b.GetRange(i-1-nBars, nBars).AsParallel().AsOrdered().Select(p => p.High).Max()
                                 //& b[i].Median > SMA(b.GetRange(i - sma, sma), sma)
                                 //& SDeviation.Last() > (SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() + 2 * SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
                                //& BarsCalculation(b.GetRange(l - nBars, nBars)) < 1
