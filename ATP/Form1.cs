@@ -39,6 +39,7 @@ namespace ATP
         public double money;
         public bool isReal=false;          //признак реальных торгов;
         public int orderId = 0;             //идентификатор заявок
+        public bool putOrder=false;         //признак есть ли необработанная заявка
         /// <summary>
         /// Инициалезация компонентов
         /// </summary>
@@ -120,7 +121,36 @@ namespace ATP
                         label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
                     }
                 }));
-            }                   
+            }  
+            if(putOrder)
+            {
+                if(TradesList.Last().State==Collections.Trade.OrderState.Close)
+                {
+                    try
+                    {
+                        SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Buy, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, 1, 0, orderId);
+                    }
+                    catch (Exception ex)
+                    {
+                        label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
+                    }
+                    orderId++;
+                    putOrder = false;
+                }
+                else if (TradesList.Last().State == Collections.Trade.OrderState.Active)
+                {
+                    try
+                    {
+                        SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Sell, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, 1, 0, orderId);
+                    }
+                    catch (Exception ex)
+                    {
+                        label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
+                    }
+                    orderId++;
+                    putOrder = false;
+                }
+            }
         }
         /// <summary>
         /// Метод отображает статус соединения с сервером
@@ -128,6 +158,8 @@ namespace ATP
         /// <param name="st"></param>
         private void DisConStatus(string st)
         {
+            SmartCom.CancelPortfolio(symbol);
+            SmartCom.CancelTicks(symbol);
             SmartCom.disconnect();
             if (InvokeRequired)
             {
@@ -142,6 +174,7 @@ namespace ATP
             {
                 label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
             }
+            SmartCom.ListenTicks(symbol);
         }
         /// <summary>
         /// Медот добавляет информацию Portfolio в список
@@ -469,6 +502,7 @@ namespace ATP
                 {
                     if (b[i].Close < b.GetRange(i-1-nBars, nBars/2).AsParallel().AsOrdered().Select(p => p.Low).Min())
                     {
+                        putOrder = true;
                         if(SmartCom.IsConnected())
                         {
                             StopBuy(b, t, i);
@@ -486,15 +520,15 @@ namespace ATP
                         SDeviation.Add(b.GetRange(i-nBars, nBars).AsParallel().AsOrdered().Select(p => p.Close).Max() - b.GetRange(i-nBars, nBars).AsParallel().AsOrdered().Select(p => p.Close).Min());
                         if (i > sma)
                         {
-                            if (b[i].Close > b.GetRange(i-1-nBars, nBars).AsParallel().AsOrdered().Select(p => p.High).Max()
-                                //& b[i].Median > SMA(b.GetRange(i - sma, sma), sma)
-                                //& SDeviation.Last() > (SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() + 2 * SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
-                               //& BarsCalculation(b.GetRange(l - nBars, nBars)) < 1
-                                )                                
-                            if(SmartCom.IsConnected())
+                            if (b[i].Close > b.GetRange(i - 1 - nBars, nBars).AsParallel().AsOrdered().Select(p => p.High).Max())                        
+                            {
+                                putOrder = true;
+                                if (SmartCom.IsConnected())
                                 {
                                     BuyOrder(b, t, i);
                                 }
+                            }
+                                
                         }
                     }
                 }
@@ -531,6 +565,10 @@ namespace ATP
                     label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
                 }
                 orderId++;
+                if (SmartCom.IsConnected())
+                {
+                    putOrder = false;
+                }
                 if (InvokeRequired)
                 {
                     Invoke(new MethodInvoker(delegate
@@ -565,7 +603,7 @@ namespace ATP
         {
             if (t.Any() && t.Last().State != Collections.Trade.OrderState.Close)
             {
-                //выставляем ордер на биржу
+                ////выставляем ордер на биржу
                 try
                 {
                     SmartCom.PlaceOrder(Portf, symbol, StOrder_Action.StOrder_Action_Sell, StOrder_Type.StOrder_Type_Market, StOrder_Validity.StOrder_Validity_Day, 0, 1, 0, orderId);
@@ -575,6 +613,10 @@ namespace ATP
                     label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
                 }
                 orderId++;
+                if(SmartCom.IsConnected())
+                {
+                    putOrder = false;
+                }
                 t.Last().ClosePrice = b[i].Close;
                 t.Last().CloseDate = b[i].Date;
                 t.Last().Result = t.Last().ClosePrice - t.Last().OpenPrice;
