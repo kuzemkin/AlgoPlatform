@@ -564,14 +564,23 @@ namespace ATP
                 {
                     label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
                 }
-                orderId++;
-                if (SmartCom.IsConnected())
+                finally
                 {
+                    orderId++;
                     putOrder = false;
-                }
-                if (InvokeRequired)
-                {
-                    Invoke(new MethodInvoker(delegate
+                    if (InvokeRequired)
+                    {
+                        Invoke(new MethodInvoker(delegate
+                        {
+                            label10.Text = t.Count().ToString();
+                            chart1.Series[1].Points.AddXY(b[i].Date, b[i].Close);
+                            chart1.Series.Add(b[i].Date.ToString());
+                            chart1.Series.Last().ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+                            chart1.Series.Last().Color = System.Drawing.Color.Blue;
+                            chart1.Series.Last().Points.AddXY(b[i].Date, b[i].Close);
+                        }));
+                    }
+                    else
                     {
                         label10.Text = t.Count().ToString();
                         chart1.Series[1].Points.AddXY(b[i].Date, b[i].Close);
@@ -579,18 +588,9 @@ namespace ATP
                         chart1.Series.Last().ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
                         chart1.Series.Last().Color = System.Drawing.Color.Blue;
                         chart1.Series.Last().Points.AddXY(b[i].Date, b[i].Close);
-                    }));
-                }
-                else
-                {
-                    label10.Text = t.Count().ToString();
-                    chart1.Series[1].Points.AddXY(b[i].Date, b[i].Close);
-                    chart1.Series.Add(b[i].Date.ToString());
-                    chart1.Series.Last().ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-                    chart1.Series.Last().Color = System.Drawing.Color.Blue;
-                    chart1.Series.Last().Points.AddXY(b[i].Date, b[i].Close);
-                }
-                ind = b.FindLastIndex(p => p.Date == t.Last().OpenDate);
+                    }
+                    ind = b.FindLastIndex(p => p.Date == t.Last().OpenDate);
+                }   
             }
         }
         /// <summary>
@@ -612,29 +612,61 @@ namespace ATP
                 {
                     label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
                 }
-                orderId++;
-                if(SmartCom.IsConnected())
+                finally
                 {
+                    orderId++;
                     putOrder = false;
-                }
-                t.Last().ClosePrice = b[i].Close;
-                t.Last().CloseDate = b[i].Date;
-                t.Last().Result = t.Last().ClosePrice - t.Last().OpenPrice;
-                t.Last().State = Collections.Trade.OrderState.Close;
-                t.Last().Span = t.Last().CloseDate - t.Last().OpenDate;
-                if (InvokeRequired)
-                {
-                    Invoke(new MethodInvoker(delegate
+                    t.Last().ClosePrice = b[i].Close;
+                    t.Last().CloseDate = b[i].Date;
+                    t.Last().Result = t.Last().ClosePrice - t.Last().OpenPrice;
+                    t.Last().State = Collections.Trade.OrderState.Close;
+                    t.Last().Span = t.Last().CloseDate - t.Last().OpenDate;
+                    if (InvokeRequired)
                     {
-                        label12.Text = t.Where(n => n.Result > 0).Select(m => m).Count().ToString();
-                        label14.Text = t.Where(n => n.Result < 0).Select(m => m).Count().ToString();
-                        label16.Text = Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum(), 1).ToString();
-                        label19.Text = Math.Round((t.Where(r => r.Result > 0).Select(s => s.Result).Sum()) / Math.Abs(t.Where(r => r.Result < 0).Select(s => s.Result).Sum()), 2).ToString();
+                        Invoke(new MethodInvoker(delegate
+                        {
+                            label12.Text = t.Where(n => n.Result > 0).Select(m => m).Count().ToString();
+                            label14.Text = t.Where(n => n.Result < 0).Select(m => m).Count().ToString();
+                            label16.Text = Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).Select(n => n.Result).Sum(), 1).ToString();
+                            label19.Text = Math.Round((t.Where(r => r.Result > 0).Select(s => s.Result).Sum()) / Math.Abs(t.Where(r => r.Result < 0).Select(s => s.Result).Sum()), 2).ToString();
+                            label21.Text = Math.Round((b.Last().Close - b[0].Open), 2).ToString();
+                            switch (interval)
+                            {
+                                case StBarInterval.StBarInterval_Day:
+                                    label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalDays) / t.Count())).ToString();
+                                    break;
+                                case StBarInterval.StBarInterval_Week:
+                                    label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalDays) / t.Count())).ToString();
+                                    break;
+                                case StBarInterval.StBarInterval_60Min:
+                                    label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalHours) / t.Count())).ToString();
+                                    break;
+                                case StBarInterval.StBarInterval_2Hour:
+                                    label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalHours) / t.Count())).ToString();
+                                    break;
+                                case StBarInterval.StBarInterval_4Hour:
+                                    label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalHours) / t.Count())).ToString();
+                                    break;
+                                default:
+                                    label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalMinutes) / t.Count())).ToString();
+                                    break;
+                            }
+                            chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);
+                            chart1.Series.Last().Points.AddXY(b[i].Date, b[i].Open);
+                            chart2.Series[0].Points.AddXY(t.Last().CloseDate, t.Where(v => v.State == Collections.Trade.OrderState.Close).AsParallel().Select(r => r.Result).Sum());
+                        }));
+                    }
+                    else
+                    {
+                        label12.Text = t.Where(n => n.Result > 0).AsParallel().Select(m => m).Count().ToString();
+                        label14.Text = t.Where(n => n.Result < 0).AsParallel().Select(m => m).Count().ToString();
+                        label16.Text = Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).AsParallel().Select(n => n.Result).Sum(), 1).ToString();
+                        label19.Text = Math.Round((t.Where(r => r.Result > 0).AsParallel().Select(s => s.Result).Sum()) / Math.Abs(t.Where(r => r.Result < 0).Select(s => s.Result).Sum()), 2).ToString();
                         label21.Text = Math.Round((b.Last().Close - b[0].Open), 2).ToString();
                         switch (interval)
                         {
                             case StBarInterval.StBarInterval_Day:
-                                label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalDays) / t.Count())).ToString();
+                                label23.Text = Math.Round((t.Select(s => s.Span).AsParallel().Sum(m => m.TotalDays) / t.Count())).ToString();
                                 break;
                             case StBarInterval.StBarInterval_Week:
                                 label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalDays) / t.Count())).ToString();
@@ -655,41 +687,9 @@ namespace ATP
                         chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);
                         chart1.Series.Last().Points.AddXY(b[i].Date, b[i].Open);
                         chart2.Series[0].Points.AddXY(t.Last().CloseDate, t.Where(v => v.State == Collections.Trade.OrderState.Close).AsParallel().Select(r => r.Result).Sum());
-                    }));
-                }
-                else
-                {
-                    label12.Text = t.Where(n => n.Result > 0).AsParallel().Select(m => m).Count().ToString();
-                    label14.Text = t.Where(n => n.Result < 0).AsParallel().Select(m => m).Count().ToString();
-                    label16.Text = Math.Round(t.Where(v => v.State == Collections.Trade.OrderState.Close).AsParallel().Select(n => n.Result).Sum(), 1).ToString();
-                    label19.Text = Math.Round((t.Where(r => r.Result > 0).AsParallel().Select(s => s.Result).Sum()) / Math.Abs(t.Where(r => r.Result < 0).Select(s => s.Result).Sum()), 2).ToString();
-                    label21.Text = Math.Round((b.Last().Close - b[0].Open), 2).ToString();
-                    switch (interval)
-                    {
-                        case StBarInterval.StBarInterval_Day:
-                            label23.Text = Math.Round((t.Select(s => s.Span).AsParallel().Sum(m => m.TotalDays) / t.Count())).ToString();
-                            break;
-                        case StBarInterval.StBarInterval_Week:
-                            label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalDays) / t.Count())).ToString();
-                            break;
-                        case StBarInterval.StBarInterval_60Min:
-                            label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalHours) / t.Count())).ToString();
-                            break;
-                        case StBarInterval.StBarInterval_2Hour:
-                            label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalHours) / t.Count())).ToString();
-                            break;
-                        case StBarInterval.StBarInterval_4Hour:
-                            label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalHours) / t.Count())).ToString();
-                            break;
-                        default:
-                            label23.Text = Math.Round((t.Select(s => s.Span).Sum(m => m.TotalMinutes) / t.Count())).ToString();
-                            break;
                     }
-                    chart1.Series[1].Points.AddXY(b[i].Date, b[i].Open);
-                    chart1.Series.Last().Points.AddXY(b[i].Date, b[i].Open);
-                    chart2.Series[0].Points.AddXY(t.Last().CloseDate, t.Where(v => v.State == Collections.Trade.OrderState.Close).AsParallel().Select(r => r.Result).Sum());
+                    ind = b.FindLastIndex(p => p.Date == t.Last().CloseDate);
                 }
-                ind = b.FindLastIndex(p => p.Date == t.Last().CloseDate);
             }
         }
         /// <summary>
