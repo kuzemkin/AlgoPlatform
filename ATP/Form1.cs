@@ -121,10 +121,10 @@ namespace ATP
                         label3.Text = $"[{DateTime.Now}]: {ex.Message}!";
                     }
                 }));
-            }  
-            if(putOrder)
+            }
+            if (putOrder)
             {
-                if(TradesList.Last().State==Collections.Trade.OrderState.Close)
+                if (TradesList.Last().State == Collections.Trade.OrderState.Close || TradesList.Count()==0)
                 {
                     try
                     {
