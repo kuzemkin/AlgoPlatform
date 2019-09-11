@@ -410,7 +410,7 @@ namespace ATP
         /// <param name="open_int"></param>
         private void AddBars(int row, int nrows, string symbol, StBarInterval interval, DateTime date, double open, double high, double low, double close, double volume, double open_int)
         {
-            BarsList.Add(new Collections.Bar(date, open, high, low, close));
+            BarsList.Add(new Collections.Bar(symbol, interval, date, open, high, low, close));
             //
             //добавляем данные на график
             //

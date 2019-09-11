@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SmartCOM4Lib;
 
 namespace ATP.Collections
 {   
@@ -11,6 +12,7 @@ namespace ATP.Collections
     /// </summary>
     public class Bar
     {
+        public string Symbol { get; set; }
         public DateTime Date { get; set; }
         public double Open { get; set; }
         public double High { get; set; }
@@ -26,8 +28,9 @@ namespace ATP.Collections
         /// <param name="high"></param>
         /// <param name="low"></param>
         /// <param name="close"></param>
-        public Bar(DateTime date, double open, double high, double low, double close)
+        public Bar(string symbol, SmartCOM4Lib.StBarInterval interval, DateTime date, double open, double high, double low, double close)
         {
+            Symbol = symbol;
             Date = date;
             Open = open;
             High = high;
