@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\Bar.cs" />
+    <Compile Include="Collections\Log.cs" />
     <Compile Include="Collections\Portfolio.cs" />
     <Compile Include="Collections\Tick.cs" />
     <Compile Include="Collections\Trade.cs" />

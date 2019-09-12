@@ -19,6 +19,7 @@ namespace ATP
         /// Подключение com-модуля
         /// </summary>
         StServerClass SmartCom = new StServerClass();
+        public Collections.Log log = new Collections.Log();
         //Объявление полей        
         public SmartCOM4Lib.StBarInterval Interval;
         private string Login {get; set;}
@@ -32,7 +33,7 @@ namespace ATP
         public List<Collections.Trade> TradesList = new List<Collections.Trade>();
         public List<Collections.Tick> TicksList = new List<Collections.Tick>();
         public List<double> SDeviation = new List<double>();
-        public int n = 100;                  //количество запрашиваемых баров 
+        public int n = 100;                  //количество запрашиваемых баров f
         public static int nBars = 25;        //количество баров для отрезка экстремумов
         public int ind = nBars;              //начальный индекс  
         public int sma=50;                //количество баров для скользящей средней  
@@ -45,7 +46,7 @@ namespace ATP
         /// </summary>
         public Form1()
         {
-            InitializeComponent();
+            InitializeComponent();            
             Timer.Tick += CheckTime;
             Timer.Interval = 1000;
             Timer.Start();
@@ -82,15 +83,24 @@ namespace ATP
                 try
                 {                    
                     label3.Text = $"[{DateTime.Now}]: Выполняется отключение.....";
+                    log.Add($"[{DateTime.Now}]: Выполняется отключение.....");
+                    label24.Text = log.LogView();
                     SmartCom.disconnect();                    
                 }
-                catch { label3.Text = $"[{DateTime.Now}]: Возникла ошибка!"; }
+                catch
+                {
+                    label3.Text = $"[{DateTime.Now}]: Возникла ошибка!";
+                    log.Add($"[{DateTime.Now}]: Возникла ошибка!");
+                    label24.Text = log.LogView();
+                }
             }
             else
             {
                 try
                 {                   
                     label3.Text = $"[{DateTime.Now}]: Выполняется подключение.....";
+                    log.Add($"[{DateTime.Now}]: Выполняется подключение.....");
+                    label24.Text = log.LogView();
                     SmartCom.connect("mx2.ittrade.ru", 8443, Login, Password);                    
                     SmartCom.Connected += ConStatus;
                     SmartCom.Disconnected += DisConStatus;                   
@@ -110,6 +120,8 @@ namespace ATP
             {
                 BeginInvoke(new MethodInvoker(delegate {
                     label3.Text = $"[{DateTime.Now}]: Соединение установлено";
+                    log.Add($"[{DateTime.Now}]: Соединение установлено");
+                    label24.Text = log.LogView();
                     button1.Text = "Отключиться";
                     try
                     {
