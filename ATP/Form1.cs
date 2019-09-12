@@ -342,9 +342,7 @@ namespace ATP
             try
             {
                 SmartCom.AddBar += AddBars;
-                SmartCom.GetBars(symbol, interval, DateTime.Now.AddMinutes(-sma),
-                    //new DateTime(SetDateTime(interval,n).Year, SetDateTime(interval, n).Month, SetDateTime(interval, n).Day, SetDateTime(interval, n).Hour, SetDateTime(interval, n).Minute, SetDateTime(interval, n).Second), 
-                    -n);                
+                SmartCom.GetBars(symbol, interval, DateTime.Now.AddMinutes(-sma), -n);                
                 SmartCom.AddTick += AddTicks;
                 SmartCom.ListenTicks(symbol);                
             }
