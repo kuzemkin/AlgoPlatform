@@ -426,15 +426,17 @@ namespace ATP
         /// </summary>
         /// <param name="b"></param>
         public void Strategy1(List<Collections.Bar> b, List<Collections.Trade> t)
-        {            
+        {
             //проверяем есть ли открытые позиции
-            if (t.Count>0 && t.Last().State==Collections.Trade.OrderState.Active)
+            if (t.Count > 0 && t.Last().State == Collections.Trade.OrderState.Active)
             {
                 //условия выхода
-                for (int i = ind+1; i < b.Count(); i++)
+                for (int i = ind + 1; i < b.Count(); i++)
                 {
-                    SDeviation.Add(b.GetRange(i-nBars, nBars).Select(p => p.Close).Max() - b.GetRange(i-nBars, nBars).Select(p => p.Close).Min());
-                    if (b[i].Close < (b.GetRange(i-1- sma, sma).Select(p => p.High).Max()) - SDeviation.GetRange(i-sma, sma).Average() & b[i].Close< b.GetRange(i - 1 - nBars, nBars).Select(p => p.Low).Min())
+                    SDeviation.Add(b.GetRange(i - nBars, nBars).Select(p => p.Close).Max() - b.GetRange(i - nBars, nBars).Select(p => p.Close).Min());
+                    if (b[i].Close < (b.GetRange(i - 1 - sma, sma).Select(p => p.High).Max()) - SDeviation.GetRange(i - sma, sma).Average() & b[i].Close < b.GetRange(i - 1 - nBars, nBars).Select(p => p.Low).Min()
+                        || b[i].Date.Hour>18 & b[i].Date.Minute>30
+                        )
                     {
                         StopBuy(b, t, i);
                     }
@@ -456,7 +458,8 @@ namespace ATP
                                //& b.GetRange(i - sma/2, sma/2).AsParallel().Select(p => p.Low).Min() > b.GetRange(i - sma, sma/2).AsParallel().Select(p => p.Low).Min()
                                //& b.GetRange(i - 2 * nBars, nBars).Select(p => p.Low).AsParallel().Min() > b.GetRange(i - 3 * nBars, nBars).Select(p => p.Low).AsParallel().Min()
                                //& b.GetRange(i - 3 * nBars, nBars).Select(p => p.Low).AsParallel().Min() > b.GetRange(i - 4 * nBars, nBars).Select(p => p.Low).AsParallel().Min()
-                               & b.GetRange(i-nBars, nBars).AsParallel().Select(p=>p.Close).Average() > SMA(b.GetRange(i-sma,sma), sma)
+                               & b.GetRange(i - nBars, nBars).AsParallel().Select(p => p.Close).Average() > SMA(b.GetRange(i - sma, sma), sma)
+                               & b[i].Date.Hour > 10 & b[i].Date.Hour<17
                                )
                             {
                                 BuyOrder(b, t, i);             
