@@ -500,7 +500,8 @@ namespace ATP
                 //условия выхода
                 for (int i = ind+1; i < b.Count(); i++)
                 {
-                    if (b[i].Close < b.GetRange(i-1-nBars, nBars/2).AsParallel().AsOrdered().Select(p => p.Low).Min())
+                    if (b[i].Close < (b.GetRange(i - 1 - nBars, nBars).Select(p => p.High).Max()) - SDeviation.GetRange(i - nBars, nBars).Average()                       
+                        || (b[i].Date.Hour > 17 & b[i].Date.Minute > 30))
                     {
                         putOrder = true;
                         if(SmartCom.IsConnected())
@@ -520,7 +521,9 @@ namespace ATP
                         SDeviation.Add(b.GetRange(i-nBars, nBars).AsParallel().AsOrdered().Select(p => p.Close).Max() - b.GetRange(i-nBars, nBars).AsParallel().AsOrdered().Select(p => p.Close).Min());
                         if (i > sma)
                         {
-                            if (b[i].Close > b.GetRange(i - 1 - nBars, nBars).AsParallel().AsOrdered().Select(p => p.High).Max())                        
+                            if (b[i].Close > b.GetRange(i - 1 - nBars, nBars).Select(p => p.High).Max()                               
+                               & SDeviation.Last() > (SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() + SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))                               
+                               & (b[i].Date.Hour > 9 & b[i].Date.Hour < 17))                        
                             {
                                 putOrder = true;
                                 if (SmartCom.IsConnected())
@@ -758,17 +761,9 @@ namespace ATP
                 case "SNGSP":
                     return Math.Round(cash / b.Last().Close * 100 / 2);
                 case "MGNT":
-                    return Math.Round(cash / b.Last().Close * 1 / 2);
-                case "Si-9.19_FT":
-                    return 1;
-                case "SBRF-9.19_FT":
-                    return 1;
-                case "GAZR-9.19_FT":
-                    return 1;
-                case "BR-9.19_FT":
-                    return 1;
+                    return Math.Round(cash / b.Last().Close * 1 / 2);                
                 default:
-                    return Math.Round(cash / b.Last().Close * 10 / 2);
+                    return 1;
             }
         }
         /// <summary>
