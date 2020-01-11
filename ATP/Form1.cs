@@ -436,7 +436,7 @@ namespace ATP
                     SDeviation.Add(b.GetRange(i - nBars, nBars).Select(p => p.Close).Max() - b.GetRange(i - nBars, nBars).Select(p => p.Close).Min());
                     if (
                          b[i].Close < (b.GetRange(i - 1 - nBars, nBars).Select(p => p.High).Max()) - SDeviation.GetRange(i - nBars, nBars).Average() 
-                         // b[i].Close < b.GetRange(i - 1 - nBars, nBars).Select(p => p.Low).Min()
+                         || b[i].Close < b.GetRange(i - 1 - nBars, nBars).Select(p => p.Low).Min()
                         || (b[i].Date.Hour>17 & b[i].Date.Minute>30)
                         )
                     {
@@ -457,7 +457,8 @@ namespace ATP
                             if (
                                b[i].Close > b.GetRange(i - 1 - nBars, nBars).Select(p => p.High).Max()
                                //& SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() < (SDeviation.GetRange(SDeviation.Count() - 2*nBars, nBars).AsParallel().Average() - SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - 2*sma, sma)))
-                               & SDeviation.Last() > (SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() + SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
+                               & SDeviation.Last() > (SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average())
+                               //+ SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))
                                //& b.GetRange(i - sma/2, sma/2).AsParallel().Select(p => p.Low).Min() > b.GetRange(i - sma, sma/2).AsParallel().Select(p => p.Low).Min()
                                //& b.GetRange(i - 2 * nBars, nBars).Select(p => p.Low).AsParallel().Min() > b.GetRange(i - 3 * nBars, nBars).Select(p => p.Low).AsParallel().Min()
                                //& b.GetRange(i - 3 * nBars, nBars).Select(p => p.Low).AsParallel().Min() > b.GetRange(i - 4 * nBars, nBars).Select(p => p.Low).AsParallel().Min()
