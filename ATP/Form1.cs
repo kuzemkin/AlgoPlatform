@@ -498,8 +498,9 @@ namespace ATP
                 //условия выхода
                 for (int i = ind+1; i < b.Count(); i++)
                 {
-                    if (b[i].Close < (b.GetRange(i - 1 - nBars, nBars).Select(p => p.High).Max()) - SDeviation.GetRange(i - nBars, nBars).Average()                       
-                        || (b[i].Date.Hour > 17 & b[i].Date.Minute > 30))
+                    if (b[i].Close < (b.GetRange(i - 1 - nBars, nBars).Select(p => p.High).Max()) - SDeviation.GetRange(i - nBars, nBars).Average()  
+                        || b[i].Close < (b.GetRange(i - 1 - nBars, nBars).Select(p => p.Low).Min())
+                        || b[i].Date.Hour > 17 & b[i].Date.Minute > 30)
                     {
                         putOrder = true;
                         if(SmartCom.IsConnected())
@@ -520,7 +521,8 @@ namespace ATP
                         if (i > sma)
                         {
                             if (b[i].Close > b.GetRange(i - 1 - nBars, nBars).Select(p => p.High).Max()                               
-                               & SDeviation.Last() > (SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average() + SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))                               
+                               & SDeviation.Last() > (SDeviation.GetRange(SDeviation.Count() - nBars, nBars).AsParallel().Average()) 
+                               //+ SDeviationCalculate(SDeviation.GetRange(SDeviation.Count() - nBars, nBars)))                               
                                & (b[i].Date.Hour > 9 & b[i].Date.Hour < 17))                        
                             {
                                 putOrder = true;
